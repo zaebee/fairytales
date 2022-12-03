@@ -1,0 +1,2 @@
+# fairytales
+Tales AI generator
