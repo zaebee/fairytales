@@ -3,8 +3,10 @@ WORKDIR /app
 COPY package*.json /app/
 RUN npm install
 COPY ./ /app/
-ARG FRONTEND_ENV=production
+ARG FRONTEND_ENV
 ENV VUE_APP_ENV=${FRONTEND_ENV}
+ARG FRONTEND_NAME
+ENV VUE_APP_NAME=${FRONTEND_NAME}
 RUN npm run build
 FROM nginx:1.15
 COPY --from=build-stage /app/dist/ /usr/share/nginx/html

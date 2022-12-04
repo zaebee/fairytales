@@ -180,10 +180,13 @@ services:
 
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
+    env_file:
+      - .env
     build:
       context: ./frontend
       args:
-        FRONTEND_ENV: ${FRONTEND_ENV-production}
+        FRONTEND_NAME: ${VUE_APP_NAME}
+        FRONTEND_ENV: ${VUE_APP_ENV-production}
     deploy:
       labels:
         - traefik.enable=true
