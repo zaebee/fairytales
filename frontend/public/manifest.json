@@ -1,6 +1,6 @@
 {
-  "name": "frontend",
-  "short_name": "frontend",
+  "name": "Fairytales AI Generator",
+  "short_name": "Fairytales AI",
   "icons": [
     {
       "src": "/img/icons/android-chrome-192x192.png",
