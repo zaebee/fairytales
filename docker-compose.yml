@@ -185,7 +185,7 @@ services:
     build:
       context: ./frontend
       args:
-        FRONTEND_NAME: ${VUE_APP_NAME}
+        FRONTEND_NAME: ${VUE_APP_NAME-Application}
         FRONTEND_ENV: ${VUE_APP_ENV-production}
     deploy:
       labels:

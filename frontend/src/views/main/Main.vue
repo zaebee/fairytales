@@ -3,7 +3,7 @@
     <v-navigation-drawer persistent :mini-variant="miniDrawer" v-model="showDrawer" fixed app>
       <v-layout column fill-height>
         <v-list>
-          <v-subheader>Main menu</v-subheader>
+          <v-subheader>Menu</v-subheader>
           <v-list-tile to="/main/dashboard">
             <v-list-tile-action>
               <v-icon>web</v-icon>
