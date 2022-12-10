@@ -2,23 +2,23 @@
   <v-container fluid>
     <v-card class="ma-3 pa-3">
       <v-card-title primary-title>
-        <div class="headline primary--text">Generate fairy tale</div>
+        <div class="headline primary--text">Dashboard</div>
       </v-card-title>
       <v-card-text>
-        <div class="headline font-weight-light">Welcome {{greetedUser}}</div>
+        <div class="headline font-weight-light ma-5">Welcome {{ greetedUser }}</div>
       </v-card-text>
       <v-card-actions>
         <v-btn to="/main/profile/view">View Profile</v-btn>
         <v-btn to="/main/profile/edit">Edit Profile</v-btn>
+        <v-btn to="/main/profile/password">Change Password</v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { Store } from 'vuex';
-import { readUserProfile } from '@/store/main/getters';
+import { Component, Vue } from "vue-property-decorator";
+import { readUserProfile } from "@/store/main/getters";
 
 @Component
 export default class Dashboard extends Vue {
@@ -31,6 +31,7 @@ export default class Dashboard extends Vue {
         return userProfile.email;
       }
     }
+    return "";
   }
 }
 </script>
