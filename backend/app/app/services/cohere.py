@@ -21,13 +21,13 @@ class TalePrompt:
     """Generates prompts for tale structure and text."""
 
     HEAD = ('Examples of breakdowns of story into Vladimir Propp\'s '
-    '"Morphology of a fairy tale" structutre.\n')
+            '"Morphology of a fairy tale" structutre.\n')
 
     SAMPLE = 'Example {counter}.\n{text}\n\n<scenes>\n{predict}\n\n<end>\n'
     SAMPLE_PREDICT = 'Example {counter}. \n{text}\n\n<scenes>'
 
     HEROES = ('Example {counter}.\n{text}\nCharacters and descriptions:'
-    '\n{heroes}\n<end>')
+              '\n{heroes}\n<end>')
     HEROES_PREDICT = 'Example {counter}.\n{text}\nCharacters and descriptions:'
 
     def __init__(self, line, as_tale=None, **kwargs):
@@ -40,6 +40,7 @@ class TalePrompt:
         self.tales = kwargs.get('tales', _tales)
 
     async def close(self):
+        """Closes connection."""
         await self.client.close_connection()
 
     @classmethod
@@ -59,7 +60,7 @@ class TalePrompt:
             'return_likelihoods': 'GENERATION',
             'stop_sequences': stop_sequences or ['<end>'],
             'num_generations': kwargs.get('num_generations', 3),
-            'temperature': kwargs.get('temperature', 0.688),
+            'temperature': kwargs.get('temperature', 0.555),
             'max_tokens': min([max_tokens, max(200, 8788 - len(prompt))])
         }
         logger.info('TALES:%s', [tale['name'] for tale in self.tales])
@@ -81,7 +82,7 @@ class TalePrompt:
                 sum_likelihood += token.likelihood
             likelihoods.append(sum_likelihood)
 
-        data = pd.DataFrame({'generation':gens, 'likelihood': likelihoods})
+        data = pd.DataFrame({'generation': gens, 'likelihood': likelihoods})
         data = data.drop_duplicates(subset=['generation'])
         data = data.sort_values('likelihood', ascending=False, ignore_index=True)
         return data
@@ -140,10 +141,10 @@ class TalePrompt:
         output.append(predict)
         return '\n'.join(output)
 
-    async def get_heroes(self, as_tale: str = None, max_tokens: int = 500):
+    async def get_heroes(self, as_tale: str = None, **kwargs):
         """Generates heroes names and descriptions."""
         prompt = self.prompt_heroes(self.line, as_tale)
-        result = await self.generate(prompt, max_tokens=max_tokens)
+        result = await self.generate(prompt, **kwargs)
         for idx, gen in enumerate(result['generation'].values):
             descriptions = re.findall(
                 r'\<description\>\s(.*?)\s<stop>', gen, re.DOTALL)
@@ -152,13 +153,13 @@ class TalePrompt:
             self.heroes[idx] = {'names': names, 'descriptions': descriptions}
         return self.heroes
 
-    async def get_structure(self, heroes: int = None, max_tokens: int = 400):
+    async def get_structure(self, heroes: int = None, **kwargs):
         """Generates tale structure gor given heroes."""
         text = [self.line]
         if heroes is not None:
             text.append('\n'.join(self.heroes[heroes]['descriptions']))
         prompt = self.prompt_structure('\n'.join(text))
-        output = await self.generate(prompt, max_tokens=max_tokens)
+        output = await self.generate(prompt, **kwargs)
         for idx, gen in enumerate(output['generation'].values):
             matched = re.search(r'(1\).*?)\n\n', gen, re.DOTALL)
             if matched:
@@ -167,7 +168,7 @@ class TalePrompt:
 
     async def get_tale(
             self, as_tale: str, structure: int = None, heroes: int = None,
-            max_tokens: int = 500):
+            **kwargs):
         """Generates final tale text for given heroes and structure."""
         text = [self.line]
         if heroes is not None:
@@ -177,7 +178,7 @@ class TalePrompt:
         prompt = self.prompt_text_as_tale('\n'.join(text), as_tale)
         if not prompt:
             return ''
-        result = await self.generate(prompt, max_tokens=max_tokens)
+        result = await self.generate(prompt, **kwargs)
         stories = []
         for idx, story in enumerate(result['generation'].values):
             stories.append(f'Story: {idx}\n{story}\n==========\n')

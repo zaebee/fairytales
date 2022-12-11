@@ -36,7 +36,9 @@ async def create_tale(
         tale_prompt.heroes = {0: dict(tale_in.heroes)}
     if tale_in.structure:
         tale_prompt.structures = {0: tale_in.structure.parts}
-    response = await tale_prompt.get_tale('MARY', structure=0, heroes=0)
+    response = await tale_prompt.get_tale(
+        tale_in.tale_style, structure=0, heroes=0,
+        temperature=tale_in.temperature)
     await tale_prompt.close()
     logger.info('Generated tale:\n %s', response)
     tale_in.stories = [schemas.Story(text=text) for text in response]
@@ -52,7 +54,8 @@ async def create_heroes(
     """
     logger.info('Passed tale:%s', tale_in)
     tale_prompt = await cohere.TalePrompt.create(tale_in.log_line)
-    response = await tale_prompt.get_heroes('BUN')
+    response = await tale_prompt.get_heroes(
+        'BUN', temperature=tale_in.temperature)
     logger.info('Generated heroes:\n %s', response)
     await tale_prompt.close()
     return [schemas.HeroBase(**hero)
@@ -69,7 +72,8 @@ async def create_structures(
     logger.info('Passed tale:\n %s', tale_in)
     tale_prompt = await cohere.TalePrompt.create(tale_in.log_line)
     tale_prompt.heroes = {0: dict(tale_in.heroes)}
-    response = await tale_prompt.get_structure(heroes=0)
+    response = await tale_prompt.get_structure(
+        heroes=0, temperature=tale_in.temperature)
     logger.info('Generated structures:\n %s', response)
     await tale_prompt.close()
     return [schemas.Structure(parts=item) for item in response.values()]
