@@ -17,7 +17,6 @@ type MainContext = ActionContext<TalesState, State>;
 export const actions = {
   async actionCheckApiError(context: MainContext, payload: unknown) {
     if (axios.isAxiosError(payload)) {
-      console.log(payload);
       const data = payload.response?.data;
       const message = data ? data["detail"] : "";
       commitAddNotification(context, {

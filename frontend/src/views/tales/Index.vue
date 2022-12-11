@@ -195,7 +195,6 @@ export default class Dashboard extends Vue {
   }
 
   public selectHeroes(index: number) {
-    console.log("selected", index);
     if (this.selectedHeroes == index) {
       this.selectedHeroes = -1;
     } else {
@@ -204,7 +203,6 @@ export default class Dashboard extends Vue {
   }
 
   public selectStruct(index: number) {
-    console.log("selected", index);
     if (this.selectedStruct == index) {
       this.selectedStruct = -1;
     } else {
@@ -213,7 +211,6 @@ export default class Dashboard extends Vue {
   }
 
   public async generateCharacters() {
-    console.log("generate characters");
     const success = await this.$refs.observer.validate();
     if (!success) {
       return;
@@ -239,7 +236,6 @@ export default class Dashboard extends Vue {
     if (heroes.names.length) {
       createStructures.heroes = heroes;
     }
-    console.log("generate structures", heroes.names);
     await dispatchCreateStructures(this.$store, createStructures);
   }
 
@@ -260,11 +256,9 @@ export default class Dashboard extends Vue {
     if (struct.parts.length) {
       createTale.structure = struct;
     }
-    console.log("generate tale");
     await dispatchCreateTale(this.$store, createTale);
   }
   public async generateImages() {
-    console.log("generate images");
   }
 }
 </script>
