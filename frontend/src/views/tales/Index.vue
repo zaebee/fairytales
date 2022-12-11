@@ -258,7 +258,8 @@ export default class Dashboard extends Vue {
     }
     await dispatchCreateTale(this.$store, createTale);
   }
-  public async generateImages() {
+  public generateImages() {
+    return;
   }
 }
 </script>
