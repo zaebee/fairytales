@@ -4,13 +4,16 @@ import re
 import os
 import cohere
 import pandas as pd
-import tales as base_tales
+
+from app.services import tales as base_tales
 
 COHERE_KEY = 'onk1aMdIZZ4P86E99JlD095UEVH7LfIUwwmEF7KQ'
 STABILITY_KEY = 'sk-kKDdwGtHoPO4kiOSWQck3D1TEaBRRAVMUPhdKyHUN9A0DVH3'
 
 # Paste your API key here. Remember to not share it publicly
 os.environ['COHERE_KEY'] = COHERE_KEY
+
+CohereError = cohere.CohereError
 
 
 class TalePrompt:
@@ -33,6 +36,9 @@ class TalePrompt:
         self.line = line
         self.as_tale = as_tale
         self.tales = kwargs.get('tales', base_tales.TALES)
+
+    async def close(self):
+        await self.client.close_connection()
 
     @classmethod
     async def create(cls, line, as_tale: str = None, **kwargs):
@@ -63,9 +69,8 @@ class TalePrompt:
             sum_likelihood = 0
             for token in gen.token_likelihoods:
                 sum_likelihood += token.likelihood
-                likelihoods.append(sum_likelihood)
+            likelihoods.append(sum_likelihood)
 
-        pd.options.display.max_colwidth = 200
         data = pd.DataFrame({'generation':gens, 'likelihood': likelihoods})
         data = data.drop_duplicates(subset=['generation'])
         data = data.sort_values('likelihood', ascending=False, ignore_index=True)
@@ -165,6 +170,9 @@ class TalePrompt:
         prompt = self.prompt_text_as_tale('\n'.join(text), as_tale)
         if not prompt:
             return ''
-        output = await self.generate(
+        result = await self.generate(
             prompt, num_generations=3, temperature=0.88, max_tokens=max_tokens)
-        return output
+        stories = []
+        for idx, story in enumerate(result['generation'].values):
+            stories.append(f'Story: {idx}\n{story}\n==========\n')
+        return '\n'.join(stories)
