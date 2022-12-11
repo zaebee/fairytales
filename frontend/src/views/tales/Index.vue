@@ -24,6 +24,34 @@
               </div>
             </validation-provider>
           </v-col>
+          <v-col cols="12" md="6">
+            <v-row align="center">
+              <v-col cols="12" sm="6">
+                <v-subheader class="pl-0">Temperature</v-subheader>
+                <v-slider
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  v-model="temperature"
+                  thumb-label="always"
+                ></v-slider>
+              </v-col>
+            </v-row>
+            <v-row align="center">
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="selectedStyle"
+                  :items="taleStyles"
+                  label="Tale style"
+                  hint="Generate yuor tale as selected"
+                  item-text="name"
+                  item-value="abbr"
+                  return-object
+                  persistent-hint
+                ></v-select>
+              </v-col>
+            </v-row>
+          </v-col>
         </v-row>
 
         <v-card-actions>
@@ -202,6 +230,16 @@ export default class Dashboard extends Vue {
   public logLine = "";
   public selectedHeroes = -1;
   public selectedStruct = -1;
+  public temperature = 0.5;
+  public selectedStyle = {
+    name: "Red Riding Hood by the Grimm brothers",
+    abbr: "RED_HOOD",
+  };
+  public taleStyles = [
+    { name: "Mary's child by the Grimm brothers", abbr: "MARY" },
+    { name: "Red Riding Hood by the Grimm brothers", abbr: "RED_HOOD" },
+    { name: "Tale about a goose", abbr: "GOSE" },
+  ];
 
   get isLoadingStatus() {
     return readStatus(this.$store);
@@ -257,6 +295,8 @@ export default class Dashboard extends Vue {
     if (this.logLine) {
       createHeroes.log_line = this.logLine;
     }
+    createHeroes.temperature = this.temperature;
+    createHeroes.tale_style = this.selectedStyle.abbr;
     await dispatchCreateHeroes(this.$store, createHeroes);
   }
 
@@ -273,6 +313,8 @@ export default class Dashboard extends Vue {
     if (heroes.names.length) {
       createStructures.heroes = heroes;
     }
+    createStructures.temperature = this.temperature;
+    createStructures.tale_style = this.selectedStyle.abbr;
     await dispatchCreateStructures(this.$store, createStructures);
   }
 
@@ -293,6 +335,8 @@ export default class Dashboard extends Vue {
     if (struct.parts.length) {
       createTale.structure = struct;
     }
+    createTale.temperature = this.temperature;
+    createTale.tale_style = this.selectedStyle.abbr;
     await dispatchCreateTale(this.$store, createTale);
   }
   public generateImages() {

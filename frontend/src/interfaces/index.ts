@@ -47,6 +47,8 @@ export interface ITale {
   structure: IStructure;
   heroes: IHero;
   stories: IStory[];
+  temperature: number;
+  tale_style: string;
 }
 
 export interface ITaleCreate {
@@ -55,4 +57,6 @@ export interface ITaleCreate {
   structure?: IStructure;
   heroes?: IHero;
   stories?: string[];
+  temperature?: number;
+  tale_style?: string;
 }
