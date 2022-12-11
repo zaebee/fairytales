@@ -1,12 +1,8 @@
-import { IHero, ITale, IStructure } from "@/interfaces";
-
-export interface AppNotification {
-  content: string;
-  color?: string;
-  showProgress?: boolean;
-}
+import { IHero, ITale, IStructure, ILoader } from "@/interfaces";
+import { AppNotification } from "../main/state";
 
 export interface TalesState {
+  loadingStatus: ILoader,
   notifications: AppNotification[];
   heroes: IHero[];
   structures: IStructure[];

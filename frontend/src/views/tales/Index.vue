@@ -6,30 +6,40 @@
       </v-card-title>
 
       <v-card-text>
-        <div class="headline font-weight-light ma-5">
-          Welcome to Fairytales AI generator
-        </div>
+        <div class="headline font-weight-light">Welcome to Fairytales AI generator</div>
       </v-card-text>
 
       <validation-observer ref="observer" v-slot="{ invalid }">
         <v-row>
           <v-col cols="12" md="6">
             <validation-provider v-slot="{ errors }" rules="required" name="Log Line">
-              <v-textarea
-                v-model="logLine"
-                required
-                :error-messages="errors"
-                label="Write a short log line for your tale"
-                placeholder="For example, A funny tale about two girls: Sasha wand Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches. They study magic, but all the time they do good deeds and because of this, they get into funny situations."
-              ></v-textarea>
+              <div class="ma-5">
+                <v-textarea
+                  v-model="logLine"
+                  required
+                  :error-messages="errors"
+                  label="Write a short log line for your tale"
+                  placeholder="For example, A funny tale about two girls: Sasha wand Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches. They study magic, but all the time they do good deeds and because of this, they get into funny situations."
+                ></v-textarea>
+              </div>
             </validation-provider>
           </v-col>
         </v-row>
 
         <v-card-actions>
-          <v-btn :disabled="invalid" color="primary" @click="generateCharacters"
+          <v-btn
+            :disabled="invalid || isLoadingStatus('heroes')"
+            color="primary"
+            @click="generateCharacters"
             >Generate characters
           </v-btn>
+          <v-progress-circular
+            v-if="isLoadingStatus('heroes')"
+            :size="20"
+            color="primary"
+            class="ml-2"
+            indeterminate
+          ></v-progress-circular>
         </v-card-actions>
       </validation-observer>
     </v-card>
@@ -68,11 +78,18 @@
       </v-row>
       <v-card-actions>
         <v-btn
-          :disabled="selectedHeroes < 0"
+          :disabled="selectedHeroes < 0 || isLoadingStatus('structures')"
           color="primary"
           @click="generateStructures"
           >Generate structure of story
         </v-btn>
+        <v-progress-circular
+          v-if="isLoadingStatus('structures')"
+          :size="20"
+          color="primary"
+          class="ml-2"
+          indeterminate
+        ></v-progress-circular>
       </v-card-actions>
     </v-card>
 
@@ -104,9 +121,20 @@
         </v-col>
       </v-row>
       <v-card-actions>
-        <v-btn :disabled="selectedStruct < 0" color="primary" @click="generateTale">
+        <v-btn
+          :disabled="selectedStruct < 0 || isLoadingStatus('tale')"
+          color="primary"
+          @click="generateTale"
+        >
           Generate fairy tale
         </v-btn>
+        <v-progress-circular
+          v-if="isLoadingStatus('tale')"
+          :size="20"
+          color="primary"
+          class="ml-2"
+          indeterminate
+        ></v-progress-circular>
       </v-card-actions>
     </v-card>
 
@@ -147,6 +175,7 @@ import {
   dispatchCreateTale,
 } from "@/store/tales/actions";
 import {
+  readStatus,
   readHeroes,
   readTale,
   readStoriesHtml,
@@ -173,6 +202,10 @@ export default class Dashboard extends Vue {
   public logLine = "";
   public selectedHeroes = -1;
   public selectedStruct = -1;
+
+  get isLoadingStatus() {
+    return readStatus(this.$store);
+  }
 
   get heroes() {
     return readHeroes(this.$store);

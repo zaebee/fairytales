@@ -22,6 +22,12 @@ export interface IUserProfileCreate {
   is_superuser?: boolean;
 }
 
+export interface ILoader {
+  heroes?: boolean;
+  structures?: boolean;
+  tale?: boolean;
+}
+
 export interface IHero {
   names: string[];
   descriptions: string[];

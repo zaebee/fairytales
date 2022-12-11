@@ -3,6 +3,9 @@ import { getStoreAccessors } from "typesafe-vuex";
 import { State } from "../state";
 
 export const getters = {
+  readStatus: (state: TalesState) => (part: string) => {
+    return state.loadingStatus[part];
+  },
   readHeroes: (state: TalesState) => state.heroes,
   selectedHeroes: (state: TalesState) => (index: number) => {
     if (state.heroes.length > index) {
@@ -35,6 +38,7 @@ export const getters = {
 
 const { read } = getStoreAccessors<TalesState, State>("");
 
+export const readStatus = read(getters.readStatus);
 export const readHeroes = read(getters.readHeroes);
 export const readStructures = read(getters.readStructures);
 export const readStructuresHtml = read(getters.readStructuresHtml);
