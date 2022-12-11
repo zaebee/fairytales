@@ -55,7 +55,8 @@ async def create_heroes(
     response = await tale_prompt.get_heroes('BUN')
     logger.info('Generated heroes:\n %s', response)
     await tale_prompt.close()
-    return [schemas.HeroBase(**hero) for hero in response.values()]
+    return [schemas.HeroBase(**hero)
+            for hero in response.values() if hero['descriptions']]
 
 
 @router.post('/structures', response_model=list[schemas.Structure])

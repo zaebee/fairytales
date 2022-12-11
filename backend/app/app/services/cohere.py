@@ -152,7 +152,7 @@ class TalePrompt:
             self.heroes[idx] = {'names': names, 'descriptions': descriptions}
         return self.heroes
 
-    async def get_structure(self, heroes: int = None, max_tokens: int = 500):
+    async def get_structure(self, heroes: int = None, max_tokens: int = 400):
         """Generates tale structure gor given heroes."""
         text = [self.line]
         if heroes is not None:
@@ -166,8 +166,8 @@ class TalePrompt:
         return self.structures
 
     async def get_tale(
-        self, as_tale: str, structure: int = None, heroes: int = None,
-        max_tokens: int = 500):
+            self, as_tale: str, structure: int = None, heroes: int = None,
+            max_tokens: int = 500):
         """Generates final tale text for given heroes and structure."""
         text = [self.line]
         if heroes is not None:

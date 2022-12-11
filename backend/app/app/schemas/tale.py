@@ -8,6 +8,7 @@ from app.schemas import hero
 class Structure(BaseModel):
     parts: Optional[str] = None
 
+
 class Story(BaseModel):
     text: Optional[str] = None
 
