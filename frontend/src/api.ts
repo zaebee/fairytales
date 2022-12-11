@@ -1,6 +1,14 @@
 import axios from "axios";
 import { apiUrl } from "@/env";
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from "./interfaces";
+import {
+  IUserProfile,
+  IUserProfileUpdate,
+  IUserProfileCreate,
+  IHero,
+  IStructure,
+  ITale,
+  ITaleCreate,
+} from "./interfaces";
 
 function authHeaders(token: string) {
   return {
@@ -45,5 +53,15 @@ export const api = {
       new_password: password,
       token,
     });
+  },
+
+  async createHeroes(data: ITaleCreate) {
+    return axios.post<IHero[]>(`${apiUrl}/api/v1/tales/heroes`, data);
+  },
+  async createStructures(data: ITaleCreate) {
+    return axios.post<IStructure[]>(`${apiUrl}/api/v1/tales/structures`, data);
+  },
+  async createTale(data: ITaleCreate) {
+    return axios.post<ITale>(`${apiUrl}/api/v1/tales/`, data);
   },
 };

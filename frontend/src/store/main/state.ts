@@ -1,4 +1,4 @@
-import { IUserProfile } from "@/interfaces";
+import { IUserProfile, IHero, ITale } from "@/interfaces";
 
 export interface AppNotification {
   content: string;

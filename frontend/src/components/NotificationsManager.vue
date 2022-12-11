@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-snackbar v-model="show" auto-height :color="currentNotificationColor">
+    <v-snackbar v-model="show" :color="currentNotificationColor">
       <v-progress-circular
         v-show="showProgress"
         class="ma-2"

@@ -21,3 +21,32 @@ export interface IUserProfileCreate {
   is_active?: boolean;
   is_superuser?: boolean;
 }
+
+export interface IHero {
+  names: string[];
+  descriptions: string[];
+}
+
+export interface IStructure {
+  parts: string;
+}
+
+export interface IStory {
+  text: string;
+}
+
+export interface ITale {
+  title: string;
+  log_line: string;
+  structure: IStructure;
+  heroes: IHero;
+  stories: IStory[];
+}
+
+export interface ITaleCreate {
+  title?: string;
+  log_line?: string;
+  structure?: IStructure;
+  heroes?: IHero;
+  stories?: string[];
+}
