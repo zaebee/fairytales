@@ -41,7 +41,7 @@
 
       <v-card-text>
         <div class="headline font-weight-light ma-5">
-          Choose heroes set suit for you
+          Choose the heroes suitable you
         </div>
       </v-card-text>
       <v-row class="mb-3">
@@ -82,7 +82,9 @@
       </v-card-title>
 
       <v-card-text>
-        <div class="headline font-weight-light ma-5">Choose strucutre suit for you</div>
+        <div class="headline font-weight-light ma-5">
+          Choose the structure that suits you
+        </div>
       </v-card-text>
       <v-row class="mb-3">
         <v-col v-for="(struct, i) in structures" :key="i" cols="12" md="4">
@@ -102,7 +104,9 @@
         </v-col>
       </v-row>
       <v-card-actions>
-        <v-btn color="primary" @click="generateTale">Generate fairy tale</v-btn>
+        <v-btn :disabled="selectedStruct < 0" color="primary" @click="generateTale">
+          Generate fairy tale
+        </v-btn>
       </v-card-actions>
     </v-card>
 
