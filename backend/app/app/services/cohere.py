@@ -1,9 +1,11 @@
 """Implements tales generator on Cohere service."""
 
+import logging
 import re
 import os
 import cohere
 import pandas as pd
+from fastapi import HTTPException
 
 from app.services import tales as base_tales
 
@@ -12,8 +14,7 @@ STABILITY_KEY = 'sk-kKDdwGtHoPO4kiOSWQck3D1TEaBRRAVMUPhdKyHUN9A0DVH3'
 
 # Paste your API key here. Remember to not share it publicly
 os.environ['COHERE_KEY'] = COHERE_KEY
-
-CohereError = cohere.CohereError
+logger = logging.getLogger('uvicorn')
 
 
 class TalePrompt:
@@ -30,12 +31,13 @@ class TalePrompt:
     HEROES_PREDICT = 'Example {counter}.\n{text}\nCharacters and descriptions:'
 
     def __init__(self, line, as_tale=None, **kwargs):
+        _tales = [tale for tale in base_tales.TALES if tale['name'] != 'BUN']
         self.client = None
         self.heroes = {}
         self.structures = {}
         self.line = line
         self.as_tale = as_tale
-        self.tales = kwargs.get('tales', base_tales.TALES)
+        self.tales = kwargs.get('tales', _tales)
 
     async def close(self):
         await self.client.close_connection()
@@ -52,15 +54,23 @@ class TalePrompt:
         stop_sequences: list[str] = None, **kwargs
     ) -> str:
         """Generates sequence from given prompt."""
+        max_tokens = kwargs.get('max_tokens', 500)
         params = {
             'return_likelihoods': 'GENERATION',
             'stop_sequences': stop_sequences or ['<end>'],
-            'max_tokens': kwargs.get('max_tokens', 50),
-            'num_generations': kwargs.get('', 5),
-            'temperature': kwargs.get('temperature', 0.7),
+            'num_generations': kwargs.get('num_generations', 3),
+            'temperature': kwargs.get('temperature', 0.688),
+            'max_tokens': min([max_tokens, max(200, 8788 - len(prompt))])
         }
-        prediction = await self.client.generate(
-            model=model, prompt=prompt, **params)
+        logger.info('TALES:%s', [tale['name'] for tale in self.tales])
+        logger.info(
+            'GENERATING for len(prompt)=%s PARAMS:=%s\n', len(prompt), params)
+        try:
+            prediction = await self.client.generate(
+                model=model, prompt=prompt, **params)
+        except cohere.CohereError as error:
+            await self.close()
+            raise HTTPException(status_code=400, detail=str(error)) from error
         gens = []
         likelihoods = []
         for gen in prediction.generations:
@@ -121,7 +131,7 @@ class TalePrompt:
         """Builds prompt to get heroes description."""
         tales = self.tales
         if as_tale:
-            tales = [tale for tale in self.tales if tale['name'] == as_tale]
+            tales = [tale for tale in base_tales.TALES if tale['name'] == as_tale]
         output = []
         for counter, tale in enumerate(tales, 1):
             output.append(self.HEROES.format(
@@ -133,9 +143,7 @@ class TalePrompt:
     async def get_heroes(self, as_tale: str = None, max_tokens: int = 500):
         """Generates heroes names and descriptions."""
         prompt = self.prompt_heroes(self.line, as_tale)
-        result = await self.generate(
-            prompt, num_generations=3, temperature=0.618,
-            max_tokens=max_tokens)
+        result = await self.generate(prompt, max_tokens=max_tokens)
         for idx, gen in enumerate(result['generation'].values):
             descriptions = re.findall(
                 r'\<description\>\s(.*?)\s<stop>', gen, re.DOTALL)
@@ -150,8 +158,7 @@ class TalePrompt:
         if heroes is not None:
             text.append('\n'.join(self.heroes[heroes]['descriptions']))
         prompt = self.prompt_structure('\n'.join(text))
-        output = await self.generate(
-            prompt, num_generations=3, temperature=0.88, max_tokens=max_tokens)
+        output = await self.generate(prompt, max_tokens=max_tokens)
         for idx, gen in enumerate(output['generation'].values):
             matched = re.search(r'(1\).*?)\n\n', gen, re.DOTALL)
             if matched:
@@ -170,9 +177,8 @@ class TalePrompt:
         prompt = self.prompt_text_as_tale('\n'.join(text), as_tale)
         if not prompt:
             return ''
-        result = await self.generate(
-            prompt, num_generations=3, temperature=0.88, max_tokens=max_tokens)
+        result = await self.generate(prompt, max_tokens=max_tokens)
         stories = []
         for idx, story in enumerate(result['generation'].values):
             stories.append(f'Story: {idx}\n{story}\n==========\n')
-        return '\n'.join(stories)
+        return stories

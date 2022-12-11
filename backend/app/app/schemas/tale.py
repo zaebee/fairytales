@@ -8,6 +8,9 @@ from app.schemas import hero
 class Structure(BaseModel):
     parts: Optional[str] = None
 
+class Story(BaseModel):
+    text: Optional[str] = None
+
 
 class TaleBase(BaseModel):
     """Shared properties."""
@@ -15,7 +18,7 @@ class TaleBase(BaseModel):
     log_line: Optional[str] = None
     structure: Optional[Structure] = None
     heroes: Optional[hero.HeroBase] = None
-    story: Optional[str] = None
+    stories: Optional[list[Story]] = None
 
 
 class TaleCreate(TaleBase):
