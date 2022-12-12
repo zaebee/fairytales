@@ -38,11 +38,12 @@ export const actions = {
       const loadingNotification = { content: "Generating heroes" };
       commitLoadingStatus(context, { heroes: true });
       commitResetHeroes(context);
+      commitResetStructures(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([
           api.createHeroes(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 700)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
         ])
       )[0];
       commitSetHeroes(context, response.data);
@@ -65,7 +66,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createStructures(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 700)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
         ])
       )[0];
       commitSetStructures(context, response.data);
@@ -88,7 +89,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createTale(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 700)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
         ])
       )[0];
       commitSetTale(context, response.data);

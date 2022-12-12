@@ -3,6 +3,17 @@ import { getStoreAccessors } from "typesafe-vuex";
 import { State } from "../state";
 
 export const getters = {
+  readStepper: (state: TalesState) => {
+    if (state.tale) {
+      return 3;
+    }
+    if (state.structures.length > 0) {
+      return 2;
+    }
+    if (state.heroes.length > 0) {
+      return 1;
+    }
+  },
   readStatus: (state: TalesState) => (part: string) => {
     return state.loadingStatus[part];
   },
@@ -38,6 +49,7 @@ export const getters = {
 
 const { read } = getStoreAccessors<TalesState, State>("");
 
+export const readStepper = read(getters.readStepper);
 export const readStatus = read(getters.readStatus);
 export const readHeroes = read(getters.readHeroes);
 export const readStructures = read(getters.readStructures);
