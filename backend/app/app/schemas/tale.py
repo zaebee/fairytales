@@ -20,6 +20,7 @@ class TaleBase(BaseModel):
     structure: Optional[Structure] = None
     heroes: Optional[hero.HeroBase] = None
     stories: Optional[list[Story]] = None
+    max_tokens: int = 250
     temperature: float = 0.5
     tale_style: Optional[str] = None
 
