@@ -4,15 +4,7 @@ import { State } from "../state";
 
 export const getters = {
   readStepper: (state: TalesState) => {
-    if (state.tale) {
-      return 3;
-    }
-    if (state.structures.length > 0) {
-      return 2;
-    }
-    if (state.heroes.length > 0) {
-      return 1;
-    }
+    return state.step;
   },
   readStatus: (state: TalesState) => (part: string) => {
     return state.loadingStatus[part];

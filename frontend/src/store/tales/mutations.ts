@@ -5,6 +5,9 @@ import { State } from "../state";
 import { AppNotification } from "../main/state";
 
 export const mutations = {
+  setStepper(state: TalesState, payload: number) {
+    state.step = payload;
+  },
   setLoadingStatus(state: TalesState, payload: ILoader) {
     Object.assign(state.loadingStatus, payload);
   },
@@ -39,6 +42,7 @@ export const mutations = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { commit } = getStoreAccessors<TalesState | any, State>("");
 
+export const commitStepper = commit(mutations.setStepper);
 export const commitLoadingStatus = commit(mutations.setLoadingStatus);
 export const commitSetHeroes = commit(mutations.setHeroes);
 export const commitResetHeroes = commit(mutations.resetHeroes);

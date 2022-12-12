@@ -4,6 +4,7 @@ import { actions } from "./actions";
 import { TalesState } from "./state";
 
 const defaultState: TalesState = {
+  step: 0,
   loadingStatus: {
     heroes: false,
     structures: false,

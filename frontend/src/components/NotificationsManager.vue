@@ -67,7 +67,7 @@ export default class NotificationsManager extends Vue {
       if (newNotification) {
         dispatchRemoveNotification(this.$store, {
           notification: newNotification,
-          timeout: 6500,
+          timeout: 2500,
         });
       }
     }

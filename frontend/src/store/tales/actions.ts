@@ -11,6 +11,7 @@ import {
   commitResetStructures,
   commitSetTale,
   commitResetTale,
+  commitStepper,
   commitLoadingStatus,
 } from "./mutations";
 import { TalesState } from "./state";
@@ -18,6 +19,9 @@ import { TalesState } from "./state";
 type MainContext = ActionContext<TalesState, State>;
 
 export const actions = {
+  actionStep(context: MainContext, payload) {
+    commitStepper(context, payload);
+  },
   async actionCheckApiError(context: MainContext, payload: unknown) {
     if (axios.isAxiosError(payload)) {
       const data = payload.response?.data;
@@ -35,11 +39,12 @@ export const actions = {
   },
   async actionCreateHeroes(context: MainContext, payload) {
     try {
+      commitStepper(context, 0);
       const loadingNotification = { content: "Generating heroes" };
       commitLoadingStatus(context, { heroes: true });
-      commitResetHeroes(context);
-      commitResetStructures(context);
       commitResetTale(context);
+      commitResetStructures(context);
+      commitResetHeroes(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([
@@ -47,6 +52,7 @@ export const actions = {
           await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
         ])
       )[0];
+      commitStepper(context, 1);
       commitSetHeroes(context, response.data);
       commitLoadingStatus(context, { heroes: false });
       commitRemoveNotification(context, loadingNotification);
@@ -62,8 +68,8 @@ export const actions = {
     try {
       const loadingNotification = { content: "Generating structures" };
       commitLoadingStatus(context, { structures: true });
-      commitResetStructures(context);
       commitResetTale(context);
+      commitResetStructures(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([
@@ -71,6 +77,7 @@ export const actions = {
           await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
         ])
       )[0];
+      commitStepper(context, 2);
       commitSetStructures(context, response.data);
       commitLoadingStatus(context, { structures: false });
       commitRemoveNotification(context, loadingNotification);
@@ -94,6 +101,7 @@ export const actions = {
           await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
         ])
       )[0];
+      commitStepper(context, 3);
       commitSetTale(context, response.data);
       commitLoadingStatus(context, { tale: false });
       commitRemoveNotification(context, loadingNotification);
@@ -110,6 +118,7 @@ export const actions = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { dispatch } = getStoreAccessors<TalesState | any, State>("");
 
+export const dispatchStep = dispatch(actions.actionStep);
 export const dispatchCheckApiError = dispatch(actions.actionCheckApiError);
 export const dispatchCreateHeroes = dispatch(actions.actionCreateHeroes);
 export const dispatchCreateStructures = dispatch(actions.actionCreateStructures);
