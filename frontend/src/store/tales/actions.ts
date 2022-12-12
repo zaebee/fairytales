@@ -39,6 +39,7 @@ export const actions = {
       commitLoadingStatus(context, { heroes: true });
       commitResetHeroes(context);
       commitResetStructures(context);
+      commitResetTale(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([
@@ -62,6 +63,7 @@ export const actions = {
       const loadingNotification = { content: "Generating structures" };
       commitLoadingStatus(context, { structures: true });
       commitResetStructures(context);
+      commitResetTale(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([

@@ -76,7 +76,7 @@
             :disabled="invalid || isLoadingStatus('heroes')"
             color="primary"
             @click="generateCharacters"
-            >Generate characters
+            >Generate heroes
           </v-btn>
           <v-progress-circular
             v-if="isLoadingStatus('heroes')"
@@ -97,7 +97,7 @@
           </v-stepper-step>
           <v-divider></v-divider>
           <v-stepper-step :complete="stepper > 1" :editable="stepper > 1" step="2">
-            Structure
+            Structures
           </v-stepper-step>
           <v-divider></v-divider>
           <v-stepper-step :complete="stepper > 2" :editable="stepper > 2" step="3">
@@ -112,7 +112,7 @@
           <v-stepper-content step="1">
             <v-card class="ma-3 pa-3" color="lighten-1" outlined>
               <v-card-title primary-title>
-                <div class="headline primary--text">Generated Heroes</div>
+                <div class="headline primary--text">Heroes</div>
               </v-card-title>
 
               <v-card-text>
@@ -165,7 +165,7 @@
           <v-stepper-content v-show="structures.length" step="2">
             <v-card class="ma-3 pa-3" outlined>
               <v-card-title primary-title>
-                <div class="headline primary--text">Generated structures</div>
+                <div class="headline primary--text">Structures</div>
               </v-card-title>
 
               <v-card-text>
@@ -210,7 +210,7 @@
           <v-stepper-content v-show="tale" step="3">
             <v-card class="ma-3 pa-3" outlined>
               <v-card-title primary-title>
-                <div class="headline primary--text">Generated tale</div>
+                <div class="headline primary--text">Stories</div>
               </v-card-title>
 
               <v-card-text>
@@ -221,7 +221,7 @@
                     color="primary"
                     @click="generateImages"
                   >
-                    Generate tale images
+                    Generate images
                   </v-btn>
                 </div>
               </v-card-text>
