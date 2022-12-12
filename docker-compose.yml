@@ -195,8 +195,26 @@ services:
         - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
         - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=80
 
+  storage:
+    image: "registry.gitlab.com/swipio/file_storage:${IMAGE_TAG:-latest}"
+    env_file:
+      - .env
+    volumes:
+      - tales-storage:/opt/app/storage
+    build:
+      context: ./storage
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+
+        - traefik.http.routers.${STACK_NAME?Variable not set}-storage-http.rule=PathPrefix(`/upload`) || PathPrefix(`/download`) || PathPrefix(`/storage-docs`)
+        - traefik.http.routers.${STACK_NAME?Variable not set}-storage-http.entrypoints=http
+        - traefik.http.services.${STACK_NAME?Variable not set}-storage.loadbalancer.server.port=80
+
 volumes:
   app-db-data:
+  tales-storage:
   tales-traefik-public-certificates:
 
 networks:
