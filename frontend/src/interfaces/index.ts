@@ -48,6 +48,7 @@ export interface ITale {
   heroes: IHero;
   stories: IStory[];
   temperature: number;
+  max_tokens: number;
   tale_style: string;
 }
 
@@ -58,5 +59,6 @@ export interface ITaleCreate {
   heroes?: IHero;
   stories?: string[];
   temperature?: number;
+  max_tokens?: number;
   tale_style?: string;
 }

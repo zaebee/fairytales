@@ -42,7 +42,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createHeroes(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 6000)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 700)),
         ])
       )[0];
       commitSetHeroes(context, response.data);
@@ -65,7 +65,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createStructures(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 6000)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 700)),
         ])
       )[0];
       commitSetStructures(context, response.data);
@@ -88,7 +88,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createTale(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 6000)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 700)),
         ])
       )[0];
       commitSetTale(context, response.data);

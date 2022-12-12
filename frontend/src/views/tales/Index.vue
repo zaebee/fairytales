@@ -1,18 +1,19 @@
 <template>
   <v-container fluid>
-    <v-card class="ma-3 pa-3">
-      <v-card-title primary-title>
-        <div class="headline primary--text">Fairytales</div>
-      </v-card-title>
+    <validation-observer ref="observer" v-slot="{ invalid }">
+      <v-card class="ma-3 pa-3">
+        <v-card-title primary-title>
+          <div class="headline primary--text">Fairytales</div>
+        </v-card-title>
+        <v-card-text>
+          <div class="headline font-weight-light">
+            Welcome to Fairytales AI generator
+          </div>
+        </v-card-text>
 
-      <v-card-text>
-        <div class="headline font-weight-light">Welcome to Fairytales AI generator</div>
-      </v-card-text>
-
-      <validation-observer ref="observer" v-slot="{ invalid }">
         <v-row>
           <v-col cols="12" md="6">
-            <validation-provider v-slot="{ errors }" rules="required" name="Log Line">
+            <validation-provider v-slot="{ errors }" rules="required" name="Log line">
               <div class="ma-5">
                 <v-textarea
                   v-model="logLine"
@@ -27,6 +28,20 @@
           <v-col cols="12" md="6">
             <v-row align="center">
               <v-col cols="12" sm="6">
+                <v-select
+                  v-model="selectedStyle"
+                  :items="taleStyles"
+                  label="Tale style"
+                  hint="Generate yuor tale as selected"
+                  item-text="name"
+                  item-value="abbr"
+                  return-object
+                  persistent-hint
+                ></v-select>
+              </v-col>
+            </v-row>
+            <v-row align="center">
+              <v-col cols="12" sm="6">
                 <v-subheader class="pl-0">Temperature</v-subheader>
                 <v-slider
                   min="0"
@@ -39,16 +54,18 @@
             </v-row>
             <v-row align="center">
               <v-col cols="12" sm="6">
-                <v-select
-                  v-model="selectedStyle"
-                  :items="taleStyles"
-                  label="Tale style"
-                  hint="Generate yuor tale as selected"
-                  item-text="name"
-                  item-value="abbr"
-                  return-object
-                  persistent-hint
-                ></v-select>
+                <validation-provider
+                  v-slot="{ errors }"
+                  rules="required|integer"
+                  name="Max tokens"
+                >
+                  <v-text-field
+                    label="Max token"
+                    v-model="maxTokens"
+                    hide-details="auto"
+                    :error-messages="errors"
+                  ></v-text-field>
+                </validation-provider>
               </v-col>
             </v-row>
           </v-col>
@@ -69,8 +86,8 @@
             indeterminate
           ></v-progress-circular>
         </v-card-actions>
-      </validation-observer>
-    </v-card>
+      </v-card>
+    </validation-observer>
 
     <v-card v-show="heroes.length" class="ma-3 pa-3">
       <v-card-title primary-title>
@@ -195,7 +212,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
-import { required } from "vee-validate/dist/rules";
+import { required, integer } from "vee-validate/dist/rules";
 import { ITaleCreate } from "@/interfaces";
 import {
   dispatchCreateHeroes,
@@ -214,6 +231,7 @@ import {
 
 // register validation rules
 extend("required", { ...required, message: "{_field_} can not be empty" });
+extend("integer", { ...integer, message: "{_field_} should be a number" });
 
 @Component({
   components: {
@@ -230,6 +248,7 @@ export default class Dashboard extends Vue {
   public logLine = "";
   public selectedHeroes = -1;
   public selectedStruct = -1;
+  public maxTokens = 500;
   public temperature = 0.5;
   public selectedStyle = {
     name: "Red Riding Hood by the Grimm brothers",
@@ -295,8 +314,11 @@ export default class Dashboard extends Vue {
     if (this.logLine) {
       createHeroes.log_line = this.logLine;
     }
-    createHeroes.temperature = this.temperature;
-    createHeroes.tale_style = this.selectedStyle.abbr;
+    Object.assign(createHeroes, {
+      tale_style: this.selectedStyle.abbr,
+      temperature: this.temperature,
+      max_tokens: this.maxTokens,
+    });
     await dispatchCreateHeroes(this.$store, createHeroes);
   }
 
@@ -313,8 +335,11 @@ export default class Dashboard extends Vue {
     if (heroes.names.length) {
       createStructures.heroes = heroes;
     }
-    createStructures.temperature = this.temperature;
-    createStructures.tale_style = this.selectedStyle.abbr;
+    Object.assign(createStructures, {
+      tale_style: this.selectedStyle.abbr,
+      temperature: this.temperature,
+      max_tokens: this.maxTokens,
+    });
     await dispatchCreateStructures(this.$store, createStructures);
   }
 
@@ -335,8 +360,11 @@ export default class Dashboard extends Vue {
     if (struct.parts.length) {
       createTale.structure = struct;
     }
-    createTale.temperature = this.temperature;
-    createTale.tale_style = this.selectedStyle.abbr;
+    Object.assign(createTale, {
+      tale_style: this.selectedStyle.abbr,
+      temperature: this.temperature,
+      max_tokens: this.maxTokens,
+    });
     await dispatchCreateTale(this.$store, createTale);
   }
   public generateImages() {
