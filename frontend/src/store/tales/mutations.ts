@@ -29,20 +29,11 @@ export const mutations = {
   setHeroes(state: TalesState, payload: IHeroSet[]) {
     state.heroSets = payload;
   },
-  resetHeroes(state: TalesState) {
-    state.heroes = [];
-  },
   setStructrues(state: TalesState, payload: IStructure[]) {
     state.structures = payload;
   },
-  resetStructrues(state: TalesState) {
-    state.structures = [];
-  },
   setTale(state: TalesState, payload: ITale) {
     state.tale = payload;
-  },
-  resetTale(state: TalesState) {
-    state.tale = null;
   },
   setHeroPortrait(state: TalesState, payload: IHeroPortrait[]) {
     const portrait = payload[0];
@@ -90,10 +81,6 @@ export const commitSetHeroPortrait = commit(mutations.setHeroPortrait);
 export const commitSetStructures = commit(mutations.setStructrues);
 export const commitSetStructImage = commit(mutations.setStructImage);
 export const commitSetTale = commit(mutations.setTale);
-
-export const commitResetHeroes = commit(mutations.resetHeroes);
-export const commitResetTale = commit(mutations.resetTale);
-export const commitResetStructures = commit(mutations.resetStructrues);
 
 export const commitSelectHeroSet = commit(mutations.selectHeroSet);
 export const commitSelectStructure = commit(mutations.selectStructure);

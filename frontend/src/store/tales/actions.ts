@@ -6,11 +6,8 @@ import { State } from "../state";
 import { commitAddNotification, commitRemoveNotification } from "../main/mutations";
 import {
   commitSetHeroes,
-  commitResetHeroes,
   commitSetStructures,
-  commitResetStructures,
   commitSetTale,
-  commitResetTale,
   commitStepper,
   commitLoadingStatus,
   commitSetHeroPortrait,
@@ -53,9 +50,6 @@ export const actions = {
     try {
       const loadingNotification = { content: "Generating heroes" };
       commitLoadingStatus(context, { heroes: true });
-      commitResetTale(context);
-      commitResetStructures(context);
-      commitResetHeroes(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([
@@ -101,8 +95,6 @@ export const actions = {
     try {
       const loadingNotification = { content: "Generating structures" };
       commitLoadingStatus(context, { structures: true });
-      commitResetTale(context);
-      commitResetStructures(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([
@@ -148,7 +140,6 @@ export const actions = {
     try {
       const loadingNotification = { content: "Generating fairy tale" };
       commitLoadingStatus(context, { tale: true });
-      commitResetTale(context);
       commitAddNotification(context, loadingNotification);
       const response = (
         await Promise.all([

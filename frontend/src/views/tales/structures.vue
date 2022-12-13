@@ -15,6 +15,14 @@
         </v-btn>
       </div>
     </v-card-text>
+    <v-fade-transition>
+      <v-overlay
+        absolute="absolute"
+        opacity="0.38"
+        :value="isLoadingStatus('structures')"
+      >
+      </v-overlay>
+    </v-fade-transition>
     <v-row class="mb-3">
       <v-col v-for="(struct, i) in structures" :key="i" cols="12" md="4">
         <v-card

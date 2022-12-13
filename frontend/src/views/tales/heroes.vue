@@ -28,6 +28,10 @@
         </v-btn>
       </div>
     </v-card-text>
+    <v-fade-transition>
+      <v-overlay absolute="absolute" opacity="0.38" :value="isLoadingStatus('heroes')">
+      </v-overlay>
+    </v-fade-transition>
     <v-row class="mb-3">
       <v-col v-for="(heroSet, i) in heroSets" :key="i" cols="12" md="4">
         <v-card
