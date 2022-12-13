@@ -117,7 +117,8 @@
           :tale-style="selectedStyle"
         />
         <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
-          Images
+          Share with friends
+          <small>Send story to your children</small>
         </v-stepper-step>
       </v-stepper>
     </validation-observer>
@@ -157,7 +158,7 @@ export default class Tales extends Vue {
 
   public valid = true;
   public logLine =
-    "Magic story about two elfs: Zae and Bee. How they went to dark forest and sow angry owl, who showed them deep river with fish and elefant.";
+    "A magical story about the elf Zae and the a bee named Moo. How they went into a dark forest and saw an evil owl that showed them a deep river where an underwater witch lived. The witch wanted to drag the elves to the bottom, but she did not succeed.";
   public maxTokens = 500;
   public temperature = 0.5;
   public selectedStyle = {

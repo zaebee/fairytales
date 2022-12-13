@@ -73,10 +73,16 @@ export interface IStructImageCreate {
   scene_id: string;
 }
 
+export interface IPart {
+  id: number;
+  text: string;
+  name: string;
+  image?: IStructImage | null;
+}
+
 export interface IStructure {
   id: number;
-  parts: string;
-  image?: IStructImage | null;
+  parts: IPart[];
 }
 
 export interface IStory {

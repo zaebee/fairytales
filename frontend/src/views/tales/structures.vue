@@ -9,6 +9,7 @@
       <v-col v-for="(struct, i) in structures" :key="i" cols="12" md="4">
         <v-card
           outlined
+          :loading="isLoadingStatus('image') && selectedStruct == i"
           class="mx-auto hero-card"
           :class="{ selected: selectedStruct == i }"
         >
@@ -22,28 +23,31 @@
               Select structure
             </v-btn>
           </v-card-title>
-          <v-card :disabled="selectedStruct != i" class="mb-5">
+          <v-card
+            v-for="(part, index) in struct.parts"
+            :key="index"
+            :disabled="selectedStruct != i"
+            class="mb-5"
+          >
             <v-img
-              v-if="struct.image"
-              :src="struct.image.path"
+              v-if="part.image"
+              :src="part.image.path"
               class="grey darken-4 white--text align-end fill-height"
               aspect-ratio="1.7"
               contain
             >
             </v-img>
             <v-card-title>
-              TEST
+              {{ part.name }}
               <v-btn
                 text
                 color="blue"
-                :loading="isLoadingStatus('image') && isStructSelected(i)"
-                @click="generateImage(i)"
+                :loading="isLoadingStatus('image') && isPartSelected(i, part)"
+                @click="generateImage(part)"
                 >Generate illustration
               </v-btn>
             </v-card-title>
-            <v-card-text>
-              <div class="text--primary" v-html="struct.parts"></div>
-            </v-card-text>
+            <v-card-text class="text--primary">{{ part.text }}</v-card-text>
           </v-card>
         </v-card>
       </v-col>
@@ -60,7 +64,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { ITaleCreate, IStructImageCreate } from "@/interfaces";
+import { IPart, ITaleCreate, IStructImageCreate } from "@/interfaces";
 import {
   dispatchStep,
   dispatchCreateTale,
@@ -80,6 +84,7 @@ import {
 })
 export default class StructuresComponent extends Vue {
   public selectedStruct = -1;
+  public selectedPart = -1;
 
   get stepper() {
     return readStepper(this.$store);
@@ -105,8 +110,8 @@ export default class StructuresComponent extends Vue {
     return selectedStructure(this.$store);
   }
 
-  isStructSelected(index: number) {
-    return this.selectedStruct == index;
+  isPartSelected(indexStruct: number, part: IPart) {
+    return this.selectedStruct == indexStruct && this.selectedPart == part.id;
   }
 
   public selectStruct(index: number) {
@@ -114,11 +119,11 @@ export default class StructuresComponent extends Vue {
     dispatchSelectStructure(this.$store, this.selectedStruct);
   }
 
-  public async generateImage(index: number) {
-    this.selectedStruct = index;
+  public async generateImage(part: IPart) {
+    this.selectedPart = part.id;
     const createStructImage: IStructImageCreate = {
-      scene_id: this.structure.id,
-      prompt: this.structure.parts,
+      scene_id: part.id,
+      prompt: part.text,
     };
     await dispatchCreateStructImage(this.$store, createStructImage);
   }

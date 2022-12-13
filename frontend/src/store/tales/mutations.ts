@@ -55,14 +55,17 @@ export const mutations = {
     state.heroes = updatedHeroes;
   },
   setStructImage(state: TalesState, payload: IStructImage[]) {
+    if (!state.structure) {
+      return;
+    }
     const image = payload[0];
-    const updatedStructures = state.structures.filter((struct) => {
-      if (struct.id === image.scene_id) {
-        struct.image = image;
+    const updatedParts = state.structure.parts.filter((part) => {
+      if (part.id === image.scene_id) {
+        part.image = image;
       }
-      return struct;
+      return part;
     });
-    state.structures = updatedStructures;
+    state.structure.parts = updatedParts;
   },
   selectHeroSet(state: TalesState, payload: number) {
     state.selectedHeroSet = payload;

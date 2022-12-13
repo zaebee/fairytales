@@ -26,14 +26,7 @@ export const getters = {
   },
   readStructures: (state: TalesState) => state.structures,
   readStructuresHtml: (state: TalesState) => {
-    const structuresHtml = state.structures.map((struct) => {
-      return {
-        id: struct.id,
-        image: struct.image,
-        parts: struct.parts.replace(/\n/g, "<br />"),
-      };
-    });
-    return structuresHtml;
+    return state.structures;
   },
   selectedStructure: (state: TalesState) => {
     if (state.structure) {
