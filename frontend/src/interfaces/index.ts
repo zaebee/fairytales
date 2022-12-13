@@ -110,3 +110,15 @@ export interface ITaleCreate {
   max_tokens?: number;
   tale_style?: string;
 }
+
+export interface IStyle {
+  name: string;
+  abbr: string;
+}
+
+export interface IFilter {
+  max_tokens: number;
+  temperature: number;
+  styles: IStyle[];
+  selected_style: IStyle;
+}

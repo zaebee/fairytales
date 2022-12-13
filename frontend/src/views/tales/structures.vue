@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { IPart, ITaleCreate, IStructImageCreate } from "@/interfaces";
+import { IPart, ITaleCreate, IStructImageCreate, IFilter } from "@/interfaces";
 import {
   dispatchCreateTale,
   dispatchCreateStructImage,
@@ -99,7 +99,11 @@ import {
 } from "@/store/tales/getters";
 
 @Component({
-  props: ["invalid", "logLine", "maxTokens", "temperature", "taleStyle"],
+  props: {
+    logLine: { type: String },
+    invalid: { type: Boolean },
+    filters: { type: IFilter },
+  },
 })
 export default class StructuresComponent extends Vue {
   public selectedStruct = -1;
@@ -138,22 +142,22 @@ export default class StructuresComponent extends Vue {
   public async generateImage(part: IPart) {
     this.selectedPart = part.id;
     const createStructImage: IStructImageCreate = {
-      scene_id: part.id,
       prompt: part.text,
+      scene_id: part.id,
+      style: this.filters.selected_style.abbr,
     };
     await dispatchCreateStructImage(this.$store, createStructImage);
   }
 
   public async generateTale() {
-    const createTale: ITaleCreate = {};
-    Object.assign(createTale, {
+    const createTale: ITaleCreate = {
       heroes: this.heroes,
       log_line: this.logLine,
       structure: this.structure,
-      max_tokens: this.maxTokens,
-      temperature: this.temperature,
-      tale_style: this.taleStyle.abbr,
-    });
+      max_tokens: this.filters.max_tokens,
+      temperature: this.filters.temperature,
+      tale_style: this.filters.selected_style.abbr,
+    };
     await dispatchCreateTale(this.$store, createTale);
   }
 }

@@ -54,7 +54,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createHeroes(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 2500)),
         ])
       )[0];
       commitStepper(context, 1);
@@ -77,7 +77,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createPortrait(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 2500)),
         ])
       )[0];
       commitSetHeroPortrait(context, response.data);
@@ -99,7 +99,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createStructures(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 2500)),
         ])
       )[0];
       commitStepper(context, 2);
@@ -122,7 +122,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createImage(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 2500)),
         ])
       )[0];
       commitSetStructImage(context, response.data);
@@ -144,7 +144,7 @@ export const actions = {
       const response = (
         await Promise.all([
           api.createTale(payload),
-          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 300)),
+          await new Promise<void>((resolve, _) => setTimeout(() => resolve(), 2500)),
         ])
       )[0];
       commitStepper(context, 3);

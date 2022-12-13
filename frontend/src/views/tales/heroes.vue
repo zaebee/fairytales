@@ -1,101 +1,94 @@
 <template>
   <v-stepper-content step="1">
-    <v-card-text>
-      <div class="headline font-weight-light">
-        Choose set of heroes suitable for you and generate portraits.
-        <vue-typer
-          v-if="readyToNext"
-          text="Great! You have created all the portraits and are ready to create the plot of the fairy tale."
-          :repeat="0"
-          :shuffle="false"
-          initial-action="typing"
-          :type-delay="20"
-          :pre-type-delay="20"
-          :erase-delay="250"
-          erase-style="select-all"
-          :erase-on-complete="false"
-          caret-animation="expand"
-        ></vue-typer>
-        <v-btn
-          outlined
-          color="primary"
-          class="float-right"
-          :loading="isLoadingStatus('heroes')"
-          :disabled="isLoadingStatus('heroes')"
-          @click="generate"
-        >
-          Regenerate heroes
-        </v-btn>
-      </div>
-    </v-card-text>
+    <div class="headline font-weight-light mb-7">
+      Choose set of heroes suitable for you and generate portraits.
+      <v-btn
+        outlined
+        color="primary"
+        class="float-md-right"
+        :loading="isLoadingStatus('heroes')"
+        :disabled="isLoadingStatus('heroes')"
+        @click="generate"
+      >
+        Regenerate heroes
+      </v-btn>
+    </div>
     <v-fade-transition>
       <v-overlay absolute="absolute" opacity="0.38" :value="isLoadingStatus('heroes')">
       </v-overlay>
     </v-fade-transition>
-    <v-row class="mb-3">
+    <v-row>
       <v-col v-for="(heroSet, i) in heroSets" :key="i" cols="12" md="4">
-        <div
-          outlined
-          :loading="isLoadingStatus('portrait') && selectedHeroSet == i"
-          class="mx-auto hero-card"
-          :class="{ selected: selectedHeroSet == i }"
-        >
-          <v-card-title primary-title>
+        <v-card class="mx-auto" :class="{ selected: selectedHeroSet == i }" outlined>
+          <v-card-actions>
             <v-btn
               :color="selectedHeroSet == i ? 'success' : 'primary'"
               :outlined="selectedHeroSet == i ? false : true"
               @click="selectHeroSet(i)"
             >
-              <v-icon v-if="selectedHeroSet == i" left>mdi-check</v-icon>
               <span>
                 {{ selectedHeroSet == i ? "Selected heroes" : "Select heroes" }}
               </span>
             </v-btn>
-          </v-card-title>
-          <v-card
-            v-for="(hero, index) in heroSet.heroes"
-            :key="index"
-            :disabled="selectedHeroSet != i"
-            class="mb-5"
-          >
-            <v-img
-              v-if="hero.portrait"
-              :src="hero.portrait.path"
-              class="grey darken-4 white--text align-end fill-height"
-              aspect-ratio="1.7"
-              contain
-            >
-            </v-img>
-            <v-card-title>
-              {{ hero.name }}
-              <v-btn
-                color="blue"
-                text
-                :loading="isLoadingStatus('portrait') && isHeroSelected(i, hero)"
-                @click="generatePortrait(hero)"
-                >Generate portrait
-              </v-btn>
-            </v-card-title>
-            <v-card-text class="text--primary">{{ hero.description }}</v-card-text>
-          </v-card>
-        </div>
+          </v-card-actions>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12">
+                <v-card
+                  v-for="(hero, index) in heroSet.heroes"
+                  :key="index"
+                  :disabled="selectedHeroSet != i"
+                  :loading="isLoadingStatus('portrait') && isHeroSelected(i, hero)"
+                  class="mb-5"
+                  outlined
+                  tile
+                >
+                  <v-img
+                    v-if="hero.portrait"
+                    :src="hero.portrait.path"
+                    class="grey darken-4 white--text align-end fill-height"
+                    aspect-ratio="1.7"
+                    contain
+                  >
+                  </v-img>
+                  <v-card-title>
+                    {{ hero.name }}
+                    <v-btn
+                      color="blue"
+                      text
+                      :loading="isLoadingStatus('portrait') && isHeroSelected(i, hero)"
+                      @click="generatePortrait(hero)"
+                      >Generate portrait
+                    </v-btn>
+                  </v-card-title>
+                  <v-card-text class="text--primary">
+                    {{ hero.description }}
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
       </v-col>
     </v-row>
-    <v-btn
-      class="mb-5"
-      color="primary"
-      :disabled="invalid || isLoadingStatus('structures') || !heroes.length"
-      :loading="isLoadingStatus('structures')"
-      @click="generateStructures()"
-      >Generate structure
-    </v-btn>
+    <v-row>
+      <v-col cols="12">
+        <v-btn
+          color="primary"
+          :disabled="invalid || isLoadingStatus('structures') || !heroes.length"
+          :loading="isLoadingStatus('structures')"
+          @click="generateStructures()"
+          >Generate structure
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-stepper-content>
 </template>
 
 <script lang="ts">
 import { VueTyper } from "vue-typer";
 import { Component, Vue } from "vue-property-decorator";
-import { ITaleCreate, IHero, IHeroPortraitCreate } from "@/interfaces";
+import { ITaleCreate, IHero, IHeroPortraitCreate, IFilter } from "@/interfaces";
 import {
   dispatchCreateStructures,
   dispatchCreateHeroPortrait,
@@ -158,9 +151,9 @@ export default class HeroesComponent extends Vue {
     Object.assign(createStructures, {
       heroes: this.heroes,
       log_line: this.logLine,
-      max_tokens: this.maxTokens,
-      temperature: this.temperature,
-      tale_style: this.taleStyle.abbr,
+      max_tokens: this.filters.max_tokens,
+      temperature: this.filters.temperature,
+      tale_style: this.filters.selected_style.abbr,
     });
     await dispatchCreateStructures(this.$store, createStructures);
   }
@@ -171,6 +164,8 @@ export default class HeroesComponent extends Vue {
     Object.assign(createHeroPortrait, {
       hero_id: hero.id,
       prompt: hero.description,
+      style: this.taleStyle.abbr,
+      tale_style: this.filters.selected_style.abbr,
     });
     await dispatchCreateHeroPortrait(this.$store, createHeroPortrait);
   }

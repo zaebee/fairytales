@@ -1,9 +1,9 @@
 <template>
   <v-container fluid>
     <validation-observer ref="observer" v-slot="{ invalid }">
-      <v-card class="ma-3 pa-3" outlined tile>
+      <v-card class="pa-3" outlined tile>
         <v-card-title primary-title>
-          <div class="headline primary--text">Fairytales</div>
+          <div class="headline primary--text">F[ai]ry tales</div>
         </v-card-title>
         <v-card-text>
           <div class="headline font-weight-light">
@@ -14,7 +14,7 @@
         <v-row>
           <v-col cols="12" md="6">
             <validation-provider v-slot="{ errors }" rules="required" name="Log line">
-              <div class="ma-5">
+              <v-form class="ma-5">
                 <v-textarea
                   v-model="logLine"
                   required
@@ -22,67 +22,24 @@
                   label="Write a short log line for your tale"
                   placeholder="For example, A funny tale about two girls: Sasha wand Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches. They study magic, but all the time they do good deeds and because of this, they get into funny situations."
                 ></v-textarea>
-              </div>
+                <v-btn
+                  :disabled="invalid || isLoadingStatus('heroes')"
+                  outlined
+                  :loading="isLoadingStatus('heroes')"
+                  color="primary"
+                  @click="generateCharacters"
+                  >Try it
+                </v-btn>
+              </v-form>
             </validation-provider>
           </v-col>
           <v-col cols="12" md="6">
-            <v-row align="center">
-              <v-col cols="12" sm="6">
-                <v-select
-                  v-model="selectedStyle"
-                  :items="taleStyles"
-                  label="Tale style"
-                  hint="Generate your tale as selected"
-                  item-text="name"
-                  item-value="abbr"
-                  return-object
-                  persistent-hint
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row align="center">
-              <v-col cols="12" sm="6">
-                <v-subheader class="pl-0">Temperature</v-subheader>
-                <v-slider
-                  v-model="temperature"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  thumb-label="always"
-                ></v-slider>
-              </v-col>
-            </v-row>
-            <v-row align="center">
-              <v-col cols="12" sm="6">
-                <validation-provider
-                  v-slot="{ errors }"
-                  rules="required|integer"
-                  name="Max tokens"
-                >
-                  <v-text-field
-                    v-model="maxTokens"
-                    label="Max token"
-                    hide-details="auto"
-                    :error-messages="errors"
-                  ></v-text-field>
-                </validation-provider>
-              </v-col>
-            </v-row>
+            <filters-component :filters="filters" />
           </v-col>
         </v-row>
-        <v-card-actions>
-          <v-btn
-            :disabled="invalid || isLoadingStatus('heroes')"
-            outlined
-            :loading="isLoadingStatus('heroes')"
-            color="primary"
-            @click="generateCharacters"
-            >Generate heroes
-          </v-btn>
-        </v-card-actions>
       </v-card>
       <v-expand-transition>
-        <v-stepper v-model="stepper" class="ma-3 pa-3" tile outlined>
+        <v-stepper v-model="stepper" tile outlined>
           <v-stepper-header>
             <v-stepper-step :complete="stepper > 0" :editable="heroSets" step="1">
               Heroes
@@ -106,27 +63,26 @@
           </v-stepper-header>
           <v-stepper-items>
             <heroes-component
-              :log-line="logLine"
-              :max-tokens="maxTokens"
-              :temperature="temperature"
-              :tale-style="selectedStyle"
               :invalid="invalid"
+              :log-line="logLine"
+              :max-tokens="filters.max_tokens"
+              :temperature="filters.temperature"
+              :tale-style="filters.selected_style"
               @generate="generateCharacters"
             />
             <structures-component
-              :log-line="logLine"
-              :max-tokens="maxTokens"
-              :temperature="temperature"
-              :tale-style="selectedStyle"
               :invalid="invalid"
+              :log-line="logLine"
+              :filters="filters"
               @generate="generateStructures"
             />
             <stories-component
-              :log-line="logLine"
-              :max-tokens="maxTokens"
-              :temperature="temperature"
-              :tale-style="selectedStyle"
               :invalid="valid"
+              :log-line="logLine"
+              :filters="filters"
+              :max-tokens="filters.max_tokens"
+              :temperature="filters.temperature"
+              :tale-style="filters.selected_style"
               @generate="generateTale"
             />
           </v-stepper-items>
@@ -141,7 +97,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
 import { required, integer } from "vee-validate/dist/rules";
 
-import { ITaleCreate } from "@/interfaces";
+import { ITaleCreate, IFilter } from "@/interfaces";
 import {
   readStatus,
   readStepper,
@@ -158,6 +114,7 @@ import {
   dispatchCreateTale,
 } from "@/store/tales/actions";
 
+import FiltersComponent from "./filters.vue";
 import HeroesComponent from "./heroes.vue";
 import StructuresComponent from "./structures.vue";
 import StoriesComponent from "./stories.vue";
@@ -170,6 +127,7 @@ extend("integer", { ...integer, message: "{_field_} should be a number" });
   components: {
     ValidationObserver,
     ValidationProvider,
+    FiltersComponent,
     HeroesComponent,
     StructuresComponent,
     StoriesComponent,
@@ -183,17 +141,22 @@ export default class Tales extends Vue {
   public valid = true;
   public logLine =
     "A magical story about the elf Zae and the a bee named Moo. How they went into a dark forest and saw an evil owl that showed them a deep river where an underwater witch lived. The witch wanted to drag the elves to the bottom, but she did not succeed.";
-  public maxTokens = 500;
-  public temperature = 0.5;
-  public selectedStyle = {
-    name: "Red Riding Hood by the Grimm brothers",
-    abbr: "RED_HOOD",
+  public filters: IFilter = {
+    max_tokens: 500,
+    temperature: 0.5,
+    selected_style: {
+      name: "Modern",
+      abbr: "MODERN",
+    },
+    styles: [
+      { name: "Modern", abbr: "MODERN" },
+      { name: "SteamPunk", abbr: "STEAMPUNK" },
+      { name: "Elfian style", abbr: "ELF" },
+      { name: "Dark black/white", abbr: "BW" },
+      { name: "Xmas style", abbr: "XMAS" },
+      { name: "Pixar movie", abbr: "PIXAR" },
+    ],
   };
-  public taleStyles = [
-    { name: "Mary's child by the Grimm brothers", abbr: "MARY" },
-    { name: "Red Riding Hood by the Grimm brothers", abbr: "RED_HOOD" },
-    { name: "Tale about a goose", abbr: "GOSE" },
-  ];
 
   get stepper() {
     return readStepper(this.$store);
@@ -234,13 +197,12 @@ export default class Tales extends Vue {
       return;
     }
 
-    const createHeroes: ITaleCreate = {};
-    Object.assign(createHeroes, {
+    const createHeroes: ITaleCreate = {
       log_line: this.logLine,
-      max_tokens: this.maxTokens,
-      temperature: this.temperature,
-      tale_style: this.selectedStyle.abbr,
-    });
+      max_tokens: this.filters.max_tokens,
+      temperature: this.filters.temperature,
+      tale_style: this.filters.selected_style.abbr,
+    };
     await dispatchCreateHeroes(this.$store, createHeroes);
   }
 
@@ -249,14 +211,13 @@ export default class Tales extends Vue {
     if (!success) {
       return;
     }
-    const createStructures: ITaleCreate = {};
-    Object.assign(createStructures, {
+    const createStructures: ITaleCreate = {
       heroes: this.heroes,
       log_line: this.logLine,
-      max_tokens: this.maxTokens,
-      temperature: this.temperature,
-      tale_style: this.selectedStyle.abbr,
-    });
+      max_tokens: this.filters.max_tokens,
+      temperature: this.filters.temperature,
+      tale_style: this.filters.selected_style.abbr,
+    };
     await dispatchCreateStructures(this.$store, createStructures);
   }
 
@@ -265,15 +226,14 @@ export default class Tales extends Vue {
     if (!success) {
       return;
     }
-    const createTale: ITaleCreate = {};
-    Object.assign(createTale, {
+    const createTale: ITaleCreate = {
       heroes: this.heroes,
       log_line: this.logLine,
       structure: this.structure,
-      max_tokens: this.maxTokens,
-      temperature: this.temperature,
-      tale_style: this.selectedStyle.abbr,
-    });
+      max_tokens: this.filters.max_tokens,
+      temperature: this.filters.temperature,
+      tale_style: this.filters.selected_style.abbr,
+    };
     await dispatchCreateTale(this.$store, createTale);
   }
 }
