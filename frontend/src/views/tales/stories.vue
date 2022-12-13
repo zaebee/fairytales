@@ -3,7 +3,7 @@
     <v-card-text>
       <div class="headline font-weight-light">
         {{ (tale && tale.title) || "Unknown Title" }}
-        <v-btn v-if="!tale.title" outlined color="primary" disabled>
+        <v-btn v-if="!(tale && tale.title)" outlined color="primary" disabled>
           Generate title
         </v-btn>
       </div>
