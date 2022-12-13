@@ -81,52 +81,58 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <v-expand-transition>
+        <v-stepper v-model="stepper" class="ma-3 pa-3" tile outlined>
+          <v-stepper-header>
+            <v-stepper-step :complete="stepper > 0" :editable="heroSets" step="1">
+              Heroes
+              <small>Create heroes of your story</small>
+            </v-stepper-step>
+            <v-divider></v-divider>
+            <v-stepper-step :complete="stepper > 1" :editable="structures" step="2">
+              Structures
+              <small>Create main plots and beats for story</small>
+            </v-stepper-step>
+            <v-divider></v-divider>
+            <v-stepper-step :complete="stepper > 2" :editable="tale" step="3">
+              Stories
+              <small>Customize you final story</small>
+            </v-stepper-step>
+            <v-divider></v-divider>
+            <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
+              Share with friends
+              <small>Send story to your children</small>
+            </v-stepper-step>
+          </v-stepper-header>
+          <v-stepper-items>
+            <heroes-component
+              :log-line="logLine"
+              :max-tokens="maxTokens"
+              :temperature="temperature"
+              :tale-style="selectedStyle"
+              :invalid="invalid"
+              @generate="generateCharacters"
+            />
+            <structures-component
+              :log-line="logLine"
+              :max-tokens="maxTokens"
+              :temperature="temperature"
+              :tale-style="selectedStyle"
+              :invalid="invalid"
+              @generate="generateStructures"
+            />
+            <stories-component
+              :log-line="logLine"
+              :max-tokens="maxTokens"
+              :temperature="temperature"
+              :tale-style="selectedStyle"
+              :invalid="valid"
+              @generate="generateTale"
+            />
+          </v-stepper-items>
+        </v-stepper>
+      </v-expand-transition>
     </validation-observer>
-
-    <v-expand-transition>
-      <v-stepper v-model="stepper" class="ma-3 pa-3" vertical tile outlined>
-        <v-stepper-step :complete="stepper > 0" :editable="heroSets" step="1">
-          Heroes
-          <small>Create heroes of your story</small>
-        </v-stepper-step>
-        <heroes-component
-          :log-line="logLine"
-          :max-tokens="maxTokens"
-          :temperature="temperature"
-          :tale-style="selectedStyle"
-          :invalid="invalid"
-          @generate="generateCharacters"
-        />
-        <v-stepper-step :complete="stepper > 1" :editable="structures" step="2">
-          Structures
-          <small>Create main plots and beats for story</small>
-        </v-stepper-step>
-        <structures-component
-          :log-line="logLine"
-          :max-tokens="maxTokens"
-          :temperature="temperature"
-          :tale-style="selectedStyle"
-          :invalid="invalid"
-          @generate="generateStructures"
-        />
-        <v-stepper-step :complete="stepper > 2" :editable="tale" step="3">
-          Stories
-          <small>Customize you final story</small>
-        </v-stepper-step>
-        <stories-component
-          :log-line="logLine"
-          :max-tokens="maxTokens"
-          :temperature="temperature"
-          :tale-style="selectedStyle"
-          :invalid="valid"
-          @generate="generateTale"
-        />
-        <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
-          Share with friends
-          <small>Send story to your children</small>
-        </v-stepper-step>
-      </v-stepper>
-    </v-expand-transition>
   </v-container>
 </template>
 
@@ -274,17 +280,7 @@ export default class Tales extends Vue {
 </script>
 
 <style>
-.heros-card {
-  cursor: pointer;
-  opacity: 0.5;
-}
-.heros-card.selected {
-  border: 1px #1976d2 solid;
-  opacity: 1;
-}
-.heros-card:not(.selected):hover {
-  border: 1px #1976d2 solid;
-  cursor: pointer;
-  opacity: 1;
+.v-card--disabled {
+  opacity: 0.25;
 }
 </style>

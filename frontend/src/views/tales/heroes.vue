@@ -2,7 +2,7 @@
   <v-stepper-content step="1">
     <v-card-text>
       <div class="headline font-weight-light">
-        Choose the heroes suitable you and generate portraits.
+        Choose set of heroes suitable for you and generate portraits.
         <vue-typer
           v-if="readyToNext"
           text="Great! You have created all the portraits and are ready to create the plot of the fairy tale."
@@ -22,7 +22,7 @@
           class="float-right"
           :loading="isLoadingStatus('heroes')"
           :disabled="isLoadingStatus('heroes')"
-          @click="$emit('generate')"
+          @click="generate"
         >
           Regenerate heroes
         </v-btn>
@@ -34,7 +34,7 @@
     </v-fade-transition>
     <v-row class="mb-3">
       <v-col v-for="(heroSet, i) in heroSets" :key="i" cols="12" md="4">
-        <v-card
+        <div
           outlined
           :loading="isLoadingStatus('portrait') && selectedHeroSet == i"
           class="mx-auto hero-card"
@@ -42,12 +42,14 @@
         >
           <v-card-title primary-title>
             <v-btn
-              color="primary"
+              :color="selectedHeroSet == i ? 'success' : 'primary'"
               :outlined="selectedHeroSet == i ? false : true"
               @click="selectHeroSet(i)"
             >
               <v-icon v-if="selectedHeroSet == i" left>mdi-check</v-icon>
-              Select heroes
+              <span>
+                {{ selectedHeroSet == i ? "Selected heroes" : "Select heroes" }}
+              </span>
             </v-btn>
           </v-card-title>
           <v-card
@@ -76,7 +78,7 @@
             </v-card-title>
             <v-card-text class="text--primary">{{ hero.description }}</v-card-text>
           </v-card>
-        </v-card>
+        </div>
       </v-col>
     </v-row>
     <v-btn
@@ -145,6 +147,12 @@ export default class HeroesComponent extends Vue {
     dispatchSelectHeroSet(this.$store, this.selectedHeroSet);
   }
 
+  public generate() {
+    this.selectedHero = -1;
+    this.selectedHeroSet = -1;
+    this.$emit("generate");
+  }
+
   public async generateStructures() {
     const createStructures: ITaleCreate = {};
     Object.assign(createStructures, {
@@ -168,10 +176,3 @@ export default class HeroesComponent extends Vue {
   }
 }
 </script>
-
-<style>
-.hero-card.selected {
-  border: 1px #1976d2 solid;
-  opacity: 1;
-}
-</style>

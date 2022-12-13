@@ -9,7 +9,7 @@
           class="float-right"
           :loading="isLoadingStatus('structures')"
           :disabled="isLoadingStatus('structures')"
-          @click="$emit('generate')"
+          @click="generate"
         >
           Regenerate structures
         </v-btn>
@@ -25,7 +25,7 @@
     </v-fade-transition>
     <v-row class="mb-3">
       <v-col v-for="(struct, i) in structures" :key="i" cols="12" md="4">
-        <v-card
+        <div
           outlined
           :loading="isLoadingStatus('image') && selectedStruct == i"
           class="mx-auto hero-card"
@@ -33,12 +33,14 @@
         >
           <v-card-title primary-title>
             <v-btn
-              color="primary"
+              :color="selectedStruct == i ? 'success' : 'primary'"
               :outlined="selectedStruct == i ? false : true"
               @click="selectStruct(i)"
             >
               <v-icon v-if="selectedStruct == i" left>mdi-check</v-icon>
-              Select structure
+              <span>
+                {{ selectedStruct == i ? "Selected structure" : "Select structure" }}
+              </span>
             </v-btn>
           </v-card-title>
           <v-card
@@ -67,7 +69,7 @@
             </v-card-title>
             <v-card-text class="text--primary">{{ part.text }}</v-card-text>
           </v-card>
-        </v-card>
+        </div>
       </v-col>
     </v-row>
     <v-btn
@@ -128,6 +130,11 @@ export default class StructuresComponent extends Vue {
     dispatchSelectStructure(this.$store, this.selectedStruct);
   }
 
+  public generate() {
+    this.selectedStruct = -1;
+    this.$emit("generate");
+  }
+
   public async generateImage(part: IPart) {
     this.selectedPart = part.id;
     const createStructImage: IStructImageCreate = {
@@ -151,10 +158,3 @@ export default class StructuresComponent extends Vue {
   }
 }
 </script>
-
-<style>
-.hero-card.selected {
-  border: 1px #1976d2 solid;
-  opacity: 1;
-}
-</style>
