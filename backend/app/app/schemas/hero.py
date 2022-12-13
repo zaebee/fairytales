@@ -1,9 +1,17 @@
 from typing import Optional
 
 from pydantic import BaseModel
+from app.schemas import image
 
 
-class HeroBase(BaseModel):
+class Hero(BaseModel):
     """Shared hero properties."""
-    names: Optional[list[str]] = None
-    descriptions: Optional[list[str]] = None
+    id: Optional[int] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    portrait: Optional[image.Image] = None
+
+
+class HeroSet(BaseModel):
+    """Shared heroes properties."""
+    heroes: Optional[list[Hero]] = None

@@ -10,7 +10,6 @@ from fastapi import HTTPException
 from app.services import tales as base_tales
 
 COHERE_KEY = 'onk1aMdIZZ4P86E99JlD095UEVH7LfIUwwmEF7KQ'
-STABILITY_KEY = 'sk-kKDdwGtHoPO4kiOSWQck3D1TEaBRRAVMUPhdKyHUN9A0DVH3'
 
 # Paste your API key here. Remember to not share it publicly
 os.environ['COHERE_KEY'] = COHERE_KEY
@@ -145,16 +144,27 @@ class TalePrompt:
         """Generates heroes names and descriptions."""
         prompt = self.prompt_heroes(self.line, as_tale)
         result = await self.generate(prompt, **kwargs)
+        output = []
         for idx, gen in enumerate(result['generation'].values):
+            heroes = []
             descriptions = re.findall(
                 r'\<description\>\s(.*?)\s<stop>', gen, re.DOTALL)
             names = re.findall(
                 r'\<character\>\s(.*?)\s<description>', gen, re.DOTALL)
             self.heroes[idx] = {'names': names, 'descriptions': descriptions}
-        return self.heroes
+            for hero_id, (name, description) in enumerate(zip(names, descriptions), start=1):
+                if description:
+                    heroes.append({
+                        'id': hero_id,
+                        'name': name,
+                        'description': description})
+            if heroes:
+                output.append(heroes)
+        return output
 
     async def get_structure(self, heroes: int = None, **kwargs):
         """Generates tale structure gor given heroes."""
+        pattern = re.compile(r"\d\) (.*?)\s\((.*?)\)", re.DOTALL)
         text = [self.line]
         if heroes is not None:
             text.append('\n'.join(self.heroes[heroes]['descriptions']))
@@ -163,7 +173,10 @@ class TalePrompt:
         for idx, gen in enumerate(output['generation'].values):
             matched = re.search(r'(1\).*?)\n\n', gen, re.DOTALL)
             if matched:
-                self.structures[idx] = matched.group()
+                parts = pattern.findall(matched.group())
+                parts = [dict(id=part_id, name=name, text=text)
+                    for part_id, (name, text) in enumerate(parts, start=1)]
+                self.structures[idx] = parts
         return self.structures
 
     async def get_tale(
@@ -181,5 +194,5 @@ class TalePrompt:
         result = await self.generate(prompt, **kwargs)
         stories = []
         for idx, story in enumerate(result['generation'].values):
-            stories.append(f'Story: {idx}\n{story}\n==========\n')
+            stories.append(f'{story}')
         return stories

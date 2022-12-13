@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 from app.services import cohere
+from app.services import stability
 
 router = APIRouter()
 logger = logging.getLogger('uvicorn')
@@ -45,7 +46,7 @@ async def create_tale(
     return tale_in
 
 
-@router.post('/heroes', response_model=list[schemas.HeroBase])
+@router.post('/heroes', response_model=list[schemas.HeroSet])
 async def create_heroes(
     *, tale_in: schemas.TaleCreate,
 ) -> Any:
@@ -58,8 +59,7 @@ async def create_heroes(
         'BUN', temperature=tale_in.temperature, max_tokens=tale_in.max_tokens)
     logger.info('Generated heroes:\n %s', response)
     await tale_prompt.close()
-    return [schemas.HeroBase(**hero)
-            for hero in response.values() if hero['descriptions']]
+    return [schemas.HeroSet(heroes=heroes) for heroes in response]
 
 
 @router.post('/structures', response_model=list[schemas.Structure])
@@ -71,10 +71,39 @@ async def create_structures(
     """
     logger.info('Passed tale:\n %s', tale_in)
     tale_prompt = await cohere.TalePrompt.create(tale_in.log_line)
-    tale_prompt.heroes = {0: dict(tale_in.heroes)}
+    descriptions = [hero.description for hero in tale_in.heroes]
+    tale_prompt.heroes = {0: {'descriptions': descriptions}}
     response = await tale_prompt.get_structure(
         heroes=0, temperature=tale_in.temperature,
         max_tokens=tale_in.max_tokens)
     logger.info('Generated structures:\n %s', response)
     await tale_prompt.close()
     return [schemas.Structure(parts=item) for item in response.values()]
+
+
+@router.post('/portraits', response_model=list[schemas.Portrait])
+def create_portraits(
+    *, image_in: schemas.PortraitCreate,
+) -> Any:
+    """
+    Create hero portraits.
+    """
+    image_prompt = stability.StabilityPrompt()
+    response = image_prompt.generate_character(
+        image_in.hero_id, image_in.prompt)
+    logger.info('Generated images:\n%s', response)
+    return [schemas.Portrait(**item) for item in response]
+
+
+@router.post('/images', response_model=list[schemas.Scene])
+def create_images(
+    *, image_in: schemas.SceneCreate,
+) -> Any:
+    """
+    Create scene images.
+    """
+    image_prompt = stability.StabilityPrompt()
+    response = image_prompt.generate_scene(
+        image_in.scene_id, image_in.prompt)
+    logger.info('Generated images:\n%s', response)
+    return [schemas.Scene(**item) for item in response]
