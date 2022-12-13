@@ -1,7 +1,7 @@
 <template>
   <validation-observer ref="observer">
     <v-row align="center">
-      <v-col cols="12" sm="6">
+      <v-col cols="12" sm="3">
         <v-select
           v-model="filters.selected_style"
           :items="filters.styles"
@@ -13,8 +13,6 @@
           persistent-hint
         ></v-select>
       </v-col>
-    </v-row>
-    <v-row align="center">
       <v-col cols="12" sm="6">
         <v-subheader class="pl-0">Temperature</v-subheader>
         <v-slider
@@ -25,9 +23,7 @@
           thumb-label="always"
         ></v-slider>
       </v-col>
-    </v-row>
-    <v-row align="center">
-      <v-col cols="12" sm="6">
+      <v-col cols="12" sm="3">
         <validation-provider
           v-slot="{ errors }"
           rules="required|integer"

@@ -23,10 +23,11 @@
                   placeholder="For example, A funny tale about two girls: Sasha wand Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches. They study magic, but all the time they do good deeds and because of this, they get into funny situations."
                 ></v-textarea>
                 <v-btn
-                  :disabled="invalid || isLoadingStatus('heroes')"
                   outlined
-                  :loading="isLoadingStatus('heroes')"
+                  class="mt-5"
                   color="primary"
+                  :disabled="invalid || isLoadingStatus('heroes')"
+                  :loading="isLoadingStatus('heroes')"
                   @click="generateCharacters"
                   >Try it
                 </v-btn>
@@ -65,9 +66,7 @@
             <heroes-component
               :invalid="invalid"
               :log-line="logLine"
-              :max-tokens="filters.max_tokens"
-              :temperature="filters.temperature"
-              :tale-style="filters.selected_style"
+              :filters="filters"
               @generate="generateCharacters"
             />
             <structures-component

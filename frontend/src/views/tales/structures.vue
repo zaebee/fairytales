@@ -1,20 +1,24 @@
 <template>
   <v-stepper-content step="2">
-    <v-card-text>
-      <div class="headline font-weight-light">
-        Choose the structure that suits you and generate illustrations.
+    <v-row>
+      <v-col cols="9">
+        <div class="text-md-h4 font-weight-light mb-7">
+          Choose the plots that suits you and generate illustrations.
+        </div>
+      </v-col>
+      <v-col cols="3">
         <v-btn
           outlined
           color="primary"
           class="float-right"
-          :loading="isLoadingStatus('structures')"
-          :disabled="isLoadingStatus('structures')"
-          @click="generate"
-        >
-          Regenerate structures
+          :disabled="invalid || isLoadingStatus('tale') || !heroes.length"
+          :loading="isLoadingStatus('tale')"
+          @click="generateTale"
+          >Next
+          <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
-      </div>
-    </v-card-text>
+      </v-col>
+    </v-row>
     <v-fade-transition>
       <v-overlay
         absolute="absolute"
@@ -23,53 +27,55 @@
       >
       </v-overlay>
     </v-fade-transition>
-    <v-row class="mb-3">
+    <v-row>
       <v-col v-for="(struct, i) in structures" :key="i" cols="12" md="4">
-        <div
-          outlined
-          :loading="isLoadingStatus('image') && selectedStruct == i"
-          class="mx-auto hero-card"
-          :class="{ selected: selectedStruct == i }"
-        >
-          <v-card-title primary-title>
+        <v-card class="mx-auto" :class="{ selected: selectedStruct == i }" outlined>
+          <v-card-actions>
             <v-btn
               :color="selectedStruct == i ? 'success' : 'primary'"
               :outlined="selectedStruct == i ? false : true"
               @click="selectStruct(i)"
             >
-              <v-icon v-if="selectedStruct == i" left>mdi-check</v-icon>
               <span>
-                {{ selectedStruct == i ? "Selected structure" : "Select structure" }}
+                {{ selectedStruct == i ? "Selected plots" : "Select plots" }}
               </span>
             </v-btn>
-          </v-card-title>
-          <v-card
-            v-for="(part, index) in struct.parts"
-            :key="index"
-            :disabled="selectedStruct != i"
-            class="mb-5"
-          >
-            <v-img
-              v-if="part.image"
-              :src="part.image.path"
-              class="grey darken-4 white--text align-end fill-height"
-              aspect-ratio="1.7"
-              contain
-            >
-            </v-img>
-            <v-card-title>
-              {{ part.name }}
-              <v-btn
-                text
-                color="blue"
-                :loading="isLoadingStatus('image') && isPartSelected(i, part)"
-                @click="generateImage(part)"
-                >Generate illustration
-              </v-btn>
-            </v-card-title>
-            <v-card-text class="text--primary">{{ part.text }}</v-card-text>
-          </v-card>
-        </div>
+          </v-card-actions>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12">
+                <v-card
+                  v-for="(part, index) in struct.parts"
+                  :key="index"
+                  :disabled="selectedStruct != i"
+                  class="mb-5"
+                  outlined
+                  tile
+                >
+                  <v-img
+                    v-if="part.image"
+                    :src="part.image.path"
+                    class="grey darken-4 white--text align-end fill-height"
+                    aspect-ratio="1.7"
+                    contain
+                  >
+                  </v-img>
+                  <v-card-title>{{ part.name }}</v-card-title>
+                  <v-card-text class="text--primary">{{ part.text }}</v-card-text>
+                  <v-card-actions>
+                    <v-btn
+                      text
+                      color="blue"
+                      :loading="isLoadingStatus('image') && isPartSelected(i, part)"
+                      @click="generateImage(part)"
+                      >Generate illustration
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
       </v-col>
     </v-row>
     <v-btn

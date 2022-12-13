@@ -1,18 +1,24 @@
 <template>
   <v-stepper-content step="1">
-    <div class="headline font-weight-light mb-7">
-      Choose set of heroes suitable for you and generate portraits.
-      <v-btn
-        outlined
-        color="primary"
-        class="float-md-right"
-        :loading="isLoadingStatus('heroes')"
-        :disabled="isLoadingStatus('heroes')"
-        @click="generate"
-      >
-        Regenerate heroes
-      </v-btn>
-    </div>
+    <v-row>
+      <v-col cols="9">
+        <div class="text-md-h4 font-weight-light mb-7">
+          Choose heroes suitable for you and generate portraits.
+        </div>
+      </v-col>
+      <v-col cols="3">
+        <v-btn
+          outlined
+          color="primary"
+          class="float-right"
+          :disabled="invalid || isLoadingStatus('structures') || !heroes.length"
+          :loading="isLoadingStatus('structures')"
+          @click="generateStructures"
+          >Next
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
     <v-fade-transition>
       <v-overlay absolute="absolute" opacity="0.38" :value="isLoadingStatus('heroes')">
       </v-overlay>
@@ -51,8 +57,11 @@
                     contain
                   >
                   </v-img>
-                  <v-card-title>
-                    {{ hero.name }}
+                  <v-card-title>{{ hero.name }}</v-card-title>
+                  <v-card-text class="text--primary">
+                    {{ hero.description }}
+                  </v-card-text>
+                  <v-card-actions>
                     <v-btn
                       color="blue"
                       text
@@ -60,10 +69,7 @@
                       @click="generatePortrait(hero)"
                       >Generate portrait
                     </v-btn>
-                  </v-card-title>
-                  <v-card-text class="text--primary">
-                    {{ hero.description }}
-                  </v-card-text>
+                  </v-card-actions>
                 </v-card>
               </v-col>
             </v-row>
@@ -75,10 +81,12 @@
       <v-col cols="12">
         <v-btn
           color="primary"
+          class="float-right"
           :disabled="invalid || isLoadingStatus('structures') || !heroes.length"
           :loading="isLoadingStatus('structures')"
           @click="generateStructures()"
-          >Generate structure
+          >Next
+          <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
       </v-col>
     </v-row>
@@ -105,7 +113,11 @@ import {
   components: {
     VueTyper,
   },
-  props: ["invalid", "logLine", "maxTokens", "temperature", "taleStyle"],
+  props: {
+    logLine: { type: String },
+    invalid: { type: Boolean },
+    filters: { type: IFilter },
+  },
 })
 export default class HeroesComponent extends Vue {
   public selectedHero = -1;
@@ -147,26 +159,23 @@ export default class HeroesComponent extends Vue {
   }
 
   public async generateStructures() {
-    const createStructures: ITaleCreate = {};
-    Object.assign(createStructures, {
+    const createStructures: ITaleCreate = {
       heroes: this.heroes,
       log_line: this.logLine,
       max_tokens: this.filters.max_tokens,
       temperature: this.filters.temperature,
       tale_style: this.filters.selected_style.abbr,
-    });
+    };
     await dispatchCreateStructures(this.$store, createStructures);
   }
 
   public async generatePortrait(hero: IHero) {
     this.selectedHero = hero.id;
-    const createHeroPortrait: IHeroPortraitCreate = {};
-    Object.assign(createHeroPortrait, {
+    const createHeroPortrait: IHeroPortraitCreate = {
       hero_id: hero.id,
       prompt: hero.description,
-      style: this.taleStyle.abbr,
-      tale_style: this.filters.selected_style.abbr,
-    });
+      style: this.filters.selected_style.abbr,
+    };
     await dispatchCreateHeroPortrait(this.$store, createHeroPortrait);
   }
 }
