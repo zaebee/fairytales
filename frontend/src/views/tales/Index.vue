@@ -81,7 +81,9 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+    </validation-observer>
 
+    <v-expand-transition>
       <v-stepper v-model="stepper" class="ma-3 pa-3" vertical tile outlined>
         <v-stepper-step :complete="stepper > 0" :editable="heroSets" step="1">
           Heroes
@@ -124,7 +126,7 @@
           <small>Send story to your children</small>
         </v-stepper-step>
       </v-stepper>
-    </validation-observer>
+    </v-expand-transition>
   </v-container>
 </template>
 
