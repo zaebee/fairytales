@@ -4,10 +4,14 @@ import {
   IUserProfile,
   IUserProfileUpdate,
   IUserProfileCreate,
-  IHero,
   IStructure,
   ITale,
   ITaleCreate,
+  IHeroSet,
+  IHeroPortrait,
+  IHeroPortraitCreate,
+  IStructImage,
+  IStructImageCreate,
 } from "./interfaces";
 
 function authHeaders(token: string) {
@@ -56,12 +60,18 @@ export const api = {
   },
 
   async createHeroes(data: ITaleCreate) {
-    return axios.post<IHero[]>(`${apiUrl}/api/v1/tales/heroes`, data);
+    return axios.post<IHeroSet[]>(`${apiUrl}/api/v1/tales/heroes`, data);
   },
   async createStructures(data: ITaleCreate) {
     return axios.post<IStructure[]>(`${apiUrl}/api/v1/tales/structures`, data);
   },
   async createTale(data: ITaleCreate) {
-    return axios.post<ITale>(`${apiUrl}/api/v1/tales/`, data);
+    return axios.post<ITale>(`${apiUrl}/api/v1/tales`, data);
+  },
+  async createPortrait(data: IHeroPortraitCreate) {
+    return axios.post<IHeroPortrait[]>(`${apiUrl}/api/v1/tales/portraits`, data);
+  },
+  async createImage(data: IStructImageCreate) {
+    return axios.post<IStructImage[]>(`${apiUrl}/api/v1/tales/images`, data);
   },
 };

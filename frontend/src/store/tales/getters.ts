@@ -10,21 +10,34 @@ export const getters = {
     return state.loadingStatus[part];
   },
   readHeroes: (state: TalesState) => state.heroes,
-  selectedHeroes: (state: TalesState) => (index: number) => {
-    if (state.heroes.length > index) {
-      return state.heroes[index];
+  readHeroSets: (state: TalesState) => state.heroSets,
+  readHeroPortrait: (state: TalesState) => (index: number) => {
+    if (state.heroes.length && state.heroes[index].portrait) {
+      return state.heroes[index].portrait;
     }
+  },
+  readHeroesPortraitsComplete: (state: TalesState) => {
+    return (
+      state.heroes.length &&
+      state.heroes.every((hero) => {
+        return hero.portrait && hero.portrait.path;
+      })
+    );
   },
   readStructures: (state: TalesState) => state.structures,
   readStructuresHtml: (state: TalesState) => {
     const structuresHtml = state.structures.map((struct) => {
-      return { parts: struct.parts.replace(/\n/g, "<br />") };
+      return {
+        id: struct.id,
+        image: struct.image,
+        parts: struct.parts.replace(/\n/g, "<br />"),
+      };
     });
     return structuresHtml;
   },
-  selectedStructure: (state: TalesState) => (index: number) => {
-    if (state.structures.length > index) {
-      return state.structures[index];
+  selectedStructure: (state: TalesState) => {
+    if (state.structure) {
+      return state.structure;
     }
   },
   readTale: (state: TalesState) => state.tale,
@@ -44,9 +57,13 @@ const { read } = getStoreAccessors<TalesState, State>("");
 export const readStepper = read(getters.readStepper);
 export const readStatus = read(getters.readStatus);
 export const readHeroes = read(getters.readHeroes);
+export const readHeroSets = read(getters.readHeroSets);
 export const readStructures = read(getters.readStructures);
 export const readStructuresHtml = read(getters.readStructuresHtml);
 export const readTale = read(getters.readTale);
 export const readStoriesHtml = read(getters.readStoriesHtml);
-export const selectedHeroes = read(getters.selectedHeroes);
+
 export const selectedStructure = read(getters.selectedStructure);
+
+export const readHeroPortrait = read(getters.readHeroPortrait);
+export const readHeroesPortraitsComplete = read(getters.readHeroesPortraitsComplete);

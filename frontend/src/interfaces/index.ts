@@ -26,15 +26,57 @@ export interface ILoader {
   heroes?: boolean;
   structures?: boolean;
   tale?: boolean;
+  portrait?: boolean;
+  image?: boolean;
+}
+
+export interface IHeroPortrait {
+  uid?: string;
+  path?: string;
+  style?: string;
+  prompt?: string;
+  hero_id?: number;
+}
+
+export interface IHeroPortraitCreate {
+  uid?: string;
+  path?: string;
+  style?: string;
+  prompt: string;
+  hero_id: string;
 }
 
 export interface IHero {
-  names: string[];
-  descriptions: string[];
+  id: number;
+  name: string;
+  description: string;
+  portrait?: IHeroPortrait | null;
+}
+
+export interface IHeroSet {
+  heroes: IHero[];
+}
+
+export interface IStructImage {
+  uid?: string;
+  path?: string;
+  style?: string;
+  prompt?: string;
+  scene_id?: number;
+}
+
+export interface IStructImageCreate {
+  uid?: string;
+  path?: string;
+  style?: string;
+  prompt: string;
+  scene_id: string;
 }
 
 export interface IStructure {
+  id: number;
   parts: string;
+  image?: IStructImage | null;
 }
 
 export interface IStory {
@@ -45,7 +87,7 @@ export interface ITale {
   title: string;
   log_line: string;
   structure: IStructure;
-  heroes: IHero;
+  heroes: IHero[];
   stories: IStory[];
   temperature: number;
   max_tokens: number;
@@ -56,8 +98,8 @@ export interface ITaleCreate {
   title?: string;
   log_line?: string;
   structure?: IStructure;
-  heroes?: IHero;
-  stories?: string[];
+  heroes?: IHero[];
+  stories?: IStory[];
   temperature?: number;
   max_tokens?: number;
   tale_style?: string;

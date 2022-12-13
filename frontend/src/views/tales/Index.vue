@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <validation-observer ref="observer" v-slot="{ invalid }">
-      <v-card class="ma-3 pa-3" outlined>
+      <v-card class="ma-3 pa-3" outlined tile>
         <v-card-title primary-title>
           <div class="headline primary--text">Fairytales</div>
         </v-card-title>
@@ -70,177 +70,57 @@
             </v-row>
           </v-col>
         </v-row>
-
         <v-card-actions>
           <v-btn
             :disabled="invalid || isLoadingStatus('heroes')"
+            outlined
+            :loading="isLoadingStatus('heroes')"
             color="primary"
             @click="generateCharacters"
             >Generate heroes
           </v-btn>
-          <v-progress-circular
-            v-if="isLoadingStatus('heroes')"
-            :size="20"
-            color="primary"
-            class="ml-2"
-            indeterminate
-          ></v-progress-circular>
         </v-card-actions>
       </v-card>
-    </validation-observer>
 
-    <div class="ma-3">
-      <v-stepper v-model="stepper">
-        <v-stepper-header>
-          <v-stepper-step :complete="stepper > 0" :editable="stepper > 0" step="1">
-            Heroes
-          </v-stepper-step>
-          <v-divider></v-divider>
-          <v-stepper-step :complete="stepper > 1" :editable="stepper > 1" step="2">
-            Structures
-          </v-stepper-step>
-          <v-divider></v-divider>
-          <v-stepper-step :complete="stepper > 2" :editable="stepper > 2" step="3">
-            Stories
-          </v-stepper-step>
-          <v-divider></v-divider>
-          <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
-            Images
-          </v-stepper-step>
-        </v-stepper-header>
-        <v-stepper-items>
-          <v-stepper-content v-show="stepper > 0" step="1">
-            <v-card-title primary-title>
-              <div class="headline primary--text">Heroes</div>
-            </v-card-title>
-
-            <v-card-text>
-              <div class="headline font-weight-light">
-                Choose the heroes suitable you and
-                <v-btn
-                  :disabled="selectedHeroes < 0 || isLoadingStatus('structures')"
-                  color="primary"
-                  @click="generateStructures"
-                  >Generate structures
-                </v-btn>
-                <v-progress-circular
-                  v-if="isLoadingStatus('structures')"
-                  :size="20"
-                  color="primary"
-                  class="ml-2"
-                  indeterminate
-                ></v-progress-circular>
-              </div>
-            </v-card-text>
-            <v-row class="mb-3">
-              <v-col v-for="(hero, i) in heroes" :key="i" cols="12" md="4">
-                <v-card
-                  class="mx-auto hero-card"
-                  tile
-                  outlined
-                  :class="{ selected: selectedHeroes == i }"
-                  @click="selectHeroes(i)"
-                >
-                  <v-card-title primary-title>
-                    <div class="headline primary--text">Set of heroes #{{ i }}</div>
-                  </v-card-title>
-                  <v-list-item
-                    v-for="(name, index) in hero.names"
-                    :key="index"
-                    three-line
-                  >
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ name }}
-                      </v-list-item-title>
-                      <v-list-item-subtitle>
-                        {{ hero.descriptions[index] }}
-                      </v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-stepper-content>
-          <v-stepper-content v-show="structures.length" step="2">
-            <v-card-title primary-title>
-              <div class="headline primary--text">Structures</div>
-            </v-card-title>
-
-            <v-card-text>
-              <div class="headline font-weight-light">
-                Choose the structure that suits you and
-                <v-btn
-                  :disabled="selectedStruct < 0 || isLoadingStatus('tale')"
-                  color="primary"
-                  @click="generateTale"
-                >
-                  Generate fairy tale
-                </v-btn>
-                <v-progress-circular
-                  v-if="isLoadingStatus('tale')"
-                  :size="20"
-                  color="primary"
-                  class="ml-2"
-                  indeterminate
-                ></v-progress-circular>
-              </div>
-            </v-card-text>
-            <v-row class="mb-3">
-              <v-col v-for="(struct, i) in structures" :key="i" cols="12" md="4">
-                <v-card
-                  class="mx-auto hero-card"
-                  tile
-                  outlined
-                  :class="{ selected: selectedStruct == i }"
-                  @click="selectStruct(i)"
-                >
-                  <v-card-title primary-title>
-                    <div class="headline primary--text">Structure #{{ i }}</div>
-                  </v-card-title>
-                  <v-card-text>
-                    <div class="text--primary" v-html="struct.parts"></div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-stepper-content>
-          <v-stepper-content v-show="tale" step="3">
-            <v-card-title primary-title>
-              <div class="headline primary--text">Stories</div>
-            </v-card-title>
-
-            <v-card-text>
-              <div class="headline font-weight-light">
-                {{ (tale && tale.title) || "Unknown Title" }}
-                <v-btn
-                  :disabled="selectedStory < 0 || isLoadingStatus('tale')"
-                  color="primary"
-                  @click="generateImages"
-                >
-                  Generate images
-                </v-btn>
-              </div>
-            </v-card-text>
-            <v-row v-if="tale" class="mb-3">
-              <v-col v-for="(story, i) in taleStories" :key="i" cols="12" md="4">
-                <v-card
-                  class="mx-auto hero-card"
-                  tile
-                  outlined
-                  :class="{ selected: selectedStory == i }"
-                  @click="selectStory(i)"
-                >
-                  <v-card-text>
-                    <div class="text--primary" v-html="story.text"></div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-stepper-content>
-        </v-stepper-items>
+      <v-stepper v-model="stepper" class="ma-3 pa-3" vertical tile outlined>
+        <v-stepper-step :complete="stepper > 0" :editable="stepper > 0" step="1">
+          Heroes
+          <small>Create heroes of your story</small>
+        </v-stepper-step>
+        <heroes-component
+          :log-line="logLine"
+          :max-tokens="maxTokens"
+          :temperature="temperature"
+          :tale-style="selectedStyle"
+          :invalid="invalid"
+        />
+        <v-stepper-step :complete="stepper > 1" editable step="2">
+          Structures
+          <small>Create main plots and beats for story</small>
+        </v-stepper-step>
+        <structures-component
+          :log-line="logLine"
+          :max-tokens="maxTokens"
+          :temperature="temperature"
+          :tale-style="selectedStyle"
+          :invalid="invalid"
+        />
+        <v-stepper-step :complete="stepper > 2" :editable="stepper > 2" step="3">
+          Stories
+          <small>Customize you final story</small>
+        </v-stepper-step>
+        <stories-component
+          :valid="valid"
+          :log-line="logLine"
+          :max-tokens="maxTokens"
+          :temperature="temperature"
+          :tale-style="selectedStyle"
+        />
+        <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
+          Images
+        </v-stepper-step>
       </v-stepper>
-    </div>
+    </validation-observer>
   </v-container>
 </template>
 
@@ -248,23 +128,14 @@
 import { Component, Vue } from "vue-property-decorator";
 import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
 import { required, integer } from "vee-validate/dist/rules";
+
 import { ITaleCreate } from "@/interfaces";
-import {
-  dispatchStep,
-  dispatchCreateHeroes,
-  dispatchCreateStructures,
-  dispatchCreateTale,
-} from "@/store/tales/actions";
-import {
-  readStatus,
-  readStepper,
-  readHeroes,
-  readTale,
-  readStoriesHtml,
-  readStructuresHtml,
-  selectedHeroes,
-  selectedStructure,
-} from "@/store/tales/getters";
+import { readStatus, readStepper } from "@/store/tales/getters";
+import { dispatchStep, dispatchCreateHeroes } from "@/store/tales/actions";
+
+import HeroesComponent from "./heroes.vue";
+import StructuresComponent from "./structures.vue";
+import StoriesComponent from "./stories.vue";
 
 // register validation rules
 extend("required", { ...required, message: "{_field_} can not be empty" });
@@ -274,18 +145,19 @@ extend("integer", { ...integer, message: "{_field_} should be a number" });
   components: {
     ValidationObserver,
     ValidationProvider,
+    HeroesComponent,
+    StructuresComponent,
+    StoriesComponent,
   },
 })
-export default class Dashboard extends Vue {
+export default class Tales extends Vue {
   $refs!: {
     observer: InstanceType<typeof ValidationObserver>;
   };
 
   public valid = true;
-  public logLine = "";
-  public selectedHeroes = -1;
-  public selectedStruct = -1;
-  public selectedStory = -1;
+  public logLine =
+    "Magic story about two elfs: Zae and Bee. How they went to dark forest and sow angry owl, who showed them deep river with fish and elefant.";
   public maxTokens = 500;
   public temperature = 0.5;
   public selectedStyle = {
@@ -310,54 +182,6 @@ export default class Dashboard extends Vue {
     return readStatus(this.$store);
   }
 
-  get heroes() {
-    return readHeroes(this.$store);
-  }
-
-  get structures() {
-    return readStructuresHtml(this.$store);
-  }
-
-  get tale() {
-    return readTale(this.$store);
-  }
-
-  get taleStories() {
-    return readStoriesHtml(this.$store);
-  }
-
-  get getHeroes() {
-    return selectedHeroes(this.$store);
-  }
-
-  get getStructure() {
-    return selectedStructure(this.$store);
-  }
-
-  public selectHeroes(index: number) {
-    if (this.selectedHeroes == index) {
-      this.selectedHeroes = -1;
-    } else {
-      this.selectedHeroes = index;
-    }
-  }
-
-  public selectStruct(index: number) {
-    if (this.selectedStruct == index) {
-      this.selectedStruct = -1;
-    } else {
-      this.selectedStruct = index;
-    }
-  }
-
-  public selectStory(index: number) {
-    if (this.selectedStory == index) {
-      this.selectedStory = -1;
-    } else {
-      this.selectedStory = index;
-    }
-  }
-
   public async generateCharacters() {
     const success = await this.$refs.observer.validate();
     if (!success) {
@@ -373,58 +197,19 @@ export default class Dashboard extends Vue {
     });
     await dispatchCreateHeroes(this.$store, createHeroes);
   }
-
-  public async generateStructures() {
-    const success = await this.$refs.observer.validate();
-    if (!success) {
-      return;
-    }
-    const createStructures: ITaleCreate = {};
-    const heroes = this.getHeroes(this.selectedHeroes);
-    Object.assign(createStructures, {
-      heroes: heroes,
-      log_line: this.logLine,
-      max_tokens: this.maxTokens,
-      temperature: this.temperature,
-      tale_style: this.selectedStyle.abbr,
-    });
-    await dispatchCreateStructures(this.$store, createStructures);
-  }
-
-  public async generateTale() {
-    const success = await this.$refs.observer.validate();
-    if (!success) {
-      return;
-    }
-    const createTale: ITaleCreate = {};
-    const heroes = this.getHeroes(this.selectedHeroes);
-    const struct = this.getStructure(this.selectedStruct);
-    Object.assign(createTale, {
-      heroes: heroes,
-      structure: struct,
-      log_line: this.logLine,
-      max_tokens: this.maxTokens,
-      temperature: this.temperature,
-      tale_style: this.selectedStyle.abbr,
-    });
-    await dispatchCreateTale(this.$store, createTale);
-  }
-  public generateImages() {
-    return;
-  }
 }
 </script>
 
 <style>
-.hero-card {
+.heros-card {
   cursor: pointer;
   opacity: 0.5;
 }
-.hero-card.selected {
+.heros-card.selected {
   border: 1px #1976d2 solid;
   opacity: 1;
 }
-.hero-card:not(.selected):hover {
+.heros-card:not(.selected):hover {
   border: 1px #1976d2 solid;
   cursor: pointer;
   opacity: 1;
