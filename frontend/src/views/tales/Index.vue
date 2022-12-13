@@ -110,11 +110,11 @@
           <small>Customize you final story</small>
         </v-stepper-step>
         <stories-component
-          :valid="valid"
           :log-line="logLine"
           :max-tokens="maxTokens"
           :temperature="temperature"
           :tale-style="selectedStyle"
+          :invalid="valid"
         />
         <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
           Share with friends

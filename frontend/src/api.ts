@@ -66,7 +66,7 @@ export const api = {
     return axios.post<IStructure[]>(`${apiUrl}/api/v1/tales/structures`, data);
   },
   async createTale(data: ITaleCreate) {
-    return axios.post<ITale>(`${apiUrl}/api/v1/tales`, data);
+    return axios.post<ITale>(`${apiUrl}/api/v1/tales/`, data);
   },
   async createPortrait(data: IHeroPortraitCreate) {
     return axios.post<IHeroPortrait[]>(`${apiUrl}/api/v1/tales/portraits`, data);

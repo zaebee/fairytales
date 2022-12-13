@@ -20,23 +20,14 @@ async def create_tale(
     """
     Create new tale.
     """
-    if not tale_in.heroes:
-        heroes_list = await create_heroes(tale_in=tale_in)
-        for heroes in heroes_list:
-            if len(heroes.descriptions):
-                tale_in.heroes = heroes
-                break
-    if not tale_in.structure:
-        structures = await create_structures(tale_in=tale_in)
-        for structure in structures:
-            if len(structure.parts):
-                tale_in.structure = structure
-                break
     tale_prompt = await cohere.TalePrompt.create(tale_in.log_line)
     if tale_in.heroes:
-        tale_prompt.heroes = {0: dict(tale_in.heroes)}
-    if tale_in.structure:
-        tale_prompt.structures = {0: tale_in.structure.parts}
+        descriptions = [hero.description for hero in tale_in.heroes]
+        tale_prompt.heroes = {0: {'descriptions': descriptions}}
+    if tale_in.structure and tale_in.structure.parts:
+        parts = [f'{i}). {part.name} {part.text}'
+            for i, part in enumerate(tale_in.structure.parts, start=1)]
+        tale_prompt.structures = {0: '\n'.join(parts)}
     response = await tale_prompt.get_tale(
         tale_in.tale_style, structure=0, heroes=0,
         temperature=tale_in.temperature, max_tokens=tale_in.max_tokens)

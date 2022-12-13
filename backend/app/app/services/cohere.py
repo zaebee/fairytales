@@ -194,5 +194,5 @@ class TalePrompt:
         result = await self.generate(prompt, **kwargs)
         stories = []
         for idx, story in enumerate(result['generation'].values):
-            stories.append(f'{story}')
+            stories.append(story.strip())
         return stories

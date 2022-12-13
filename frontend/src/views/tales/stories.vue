@@ -1,18 +1,10 @@
 <template>
   <v-stepper-content v-show="tale" step="3">
-    <v-card-title primary-title>
-      <div class="headline primary--text">Stories</div>
-    </v-card-title>
-
     <v-card-text>
       <div class="headline font-weight-light">
         {{ (tale && tale.title) || "Unknown Title" }}
-        <v-btn
-          :disabled="selectedStory < 0 || isLoadingStatus('tale')"
-          color="primary"
-          @click="generateImages"
-        >
-          Generate images
+        <v-btn v-if="!tale.title" outlined color="primary" disabled>
+          Generate title
         </v-btn>
       </div>
     </v-card-text>
@@ -23,7 +15,6 @@
           tile
           outlined
           :class="{ selected: selectedStory == i }"
-          @click="selectStory(i)"
         >
           <v-card-text>
             <div class="text--primary" v-html="story.text"></div>
@@ -31,6 +22,7 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-btn color="primary" :disabled="invalid" @click="finish()">Finish</v-btn>
   </v-stepper-content>
 </template>
 
@@ -44,9 +36,10 @@ import {
   readStoriesHtml,
 } from "@/store/tales/getters";
 
-@Component
+@Component({
+  props: ["invalid", "logLine", "maxTokens", "temperature", "taleStyle"],
+})
 export default class StoriesComponent extends Vue {
-  public valid = true;
   public selectedStory = -1;
 
   get stepper() {
@@ -77,7 +70,7 @@ export default class StoriesComponent extends Vue {
     }
   }
 
-  public generateImages() {
+  public finish() {
     return;
   }
 }

@@ -129,10 +129,6 @@ export default class StructuresComponent extends Vue {
   }
 
   public async generateTale() {
-    const success = await this.$refs.observer.validate();
-    if (!success) {
-      return;
-    }
     const createTale: ITaleCreate = {};
     Object.assign(createTale, {
       heroes: this.heroes,
@@ -140,7 +136,7 @@ export default class StructuresComponent extends Vue {
       structure: this.structure,
       max_tokens: this.maxTokens,
       temperature: this.temperature,
-      tale_style: this.selectedStyle.abbr,
+      tale_style: this.taleStyle.abbr,
     });
     await dispatchCreateTale(this.$store, createTale);
   }
