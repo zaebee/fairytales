@@ -1,8 +1,18 @@
 <template>
-  <v-stepper-content v-show="stepper > 1" step="2">
+  <v-stepper-content step="2">
     <v-card-text>
       <div class="headline font-weight-light">
         Choose the structure that suits you and generate illustrations.
+        <v-btn
+          outlined
+          color="primary"
+          class="float-right"
+          :loading="isLoadingStatus('structures')"
+          :disabled="isLoadingStatus('structures')"
+          @click="$emit('generate')"
+        >
+          Regenerate structures
+        </v-btn>
       </div>
     </v-card-text>
     <v-row class="mb-3">
@@ -53,6 +63,7 @@
       </v-col>
     </v-row>
     <v-btn
+      class="mb-5"
       color="primary"
       :disabled="invalid || selectedStruct < 0 || isLoadingStatus('tale')"
       :loading="isLoadingStatus('tale')"
@@ -66,16 +77,14 @@
 import { Component, Vue } from "vue-property-decorator";
 import { IPart, ITaleCreate, IStructImageCreate } from "@/interfaces";
 import {
-  dispatchStep,
   dispatchCreateTale,
   dispatchCreateStructImage,
   dispatchSelectStructure,
 } from "@/store/tales/actions";
 import {
   readStatus,
-  readStepper,
   readHeroes,
-  readStructuresHtml,
+  readStructures,
   selectedStructure,
 } from "@/store/tales/getters";
 
@@ -86,14 +95,6 @@ export default class StructuresComponent extends Vue {
   public selectedStruct = -1;
   public selectedPart = -1;
 
-  get stepper() {
-    return readStepper(this.$store);
-  }
-
-  stepperN(step: number) {
-    dispatchStep(this.$store, step);
-  }
-
   get isLoadingStatus() {
     return readStatus(this.$store);
   }
@@ -103,7 +104,7 @@ export default class StructuresComponent extends Vue {
   }
 
   get structures() {
-    return readStructuresHtml(this.$store);
+    return readStructures(this.$store);
   }
 
   get structure() {

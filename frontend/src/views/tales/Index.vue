@@ -83,7 +83,7 @@
       </v-card>
 
       <v-stepper v-model="stepper" class="ma-3 pa-3" vertical tile outlined>
-        <v-stepper-step :complete="stepper > 0" :editable="stepper > 0" step="1">
+        <v-stepper-step :complete="stepper > 0" :editable="heroSets" step="1">
           Heroes
           <small>Create heroes of your story</small>
         </v-stepper-step>
@@ -93,8 +93,9 @@
           :temperature="temperature"
           :tale-style="selectedStyle"
           :invalid="invalid"
+          @generate="generateCharacters"
         />
-        <v-stepper-step :complete="stepper > 1" editable step="2">
+        <v-stepper-step :complete="stepper > 1" :editable="structures" step="2">
           Structures
           <small>Create main plots and beats for story</small>
         </v-stepper-step>
@@ -104,8 +105,9 @@
           :temperature="temperature"
           :tale-style="selectedStyle"
           :invalid="invalid"
+          @generate="generateStructures"
         />
-        <v-stepper-step :complete="stepper > 2" :editable="stepper > 2" step="3">
+        <v-stepper-step :complete="stepper > 2" :editable="tale" step="3">
           Stories
           <small>Customize you final story</small>
         </v-stepper-step>
@@ -115,6 +117,7 @@
           :temperature="temperature"
           :tale-style="selectedStyle"
           :invalid="valid"
+          @generate="generateTale"
         />
         <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
           Share with friends
@@ -131,8 +134,21 @@ import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
 import { required, integer } from "vee-validate/dist/rules";
 
 import { ITaleCreate } from "@/interfaces";
-import { readStatus, readStepper } from "@/store/tales/getters";
-import { dispatchStep, dispatchCreateHeroes } from "@/store/tales/actions";
+import {
+  readStatus,
+  readStepper,
+  readTale,
+  readHeroes,
+  readHeroSets,
+  readStructures,
+  selectedStructure,
+} from "@/store/tales/getters";
+import {
+  dispatchStep,
+  dispatchCreateHeroes,
+  dispatchCreateStructures,
+  dispatchCreateTale,
+} from "@/store/tales/actions";
 
 import HeroesComponent from "./heroes.vue";
 import StructuresComponent from "./structures.vue";
@@ -179,6 +195,27 @@ export default class Tales extends Vue {
     dispatchStep(this.$store, step);
   }
 
+  get heroes() {
+    return readHeroes(this.$store);
+  }
+
+  get heroSets() {
+    return readHeroSets(this.$store).length > 0;
+  }
+
+  get structures() {
+    return readStructures(this.$store).length > 0;
+  }
+
+  get structure() {
+    return selectedStructure(this.$store);
+  }
+
+  get tale() {
+    const tale = readTale(this.$store);
+    return tale && tale.stories.length > 0;
+  }
+
   get isLoadingStatus() {
     return readStatus(this.$store);
   }
@@ -197,6 +234,39 @@ export default class Tales extends Vue {
       tale_style: this.selectedStyle.abbr,
     });
     await dispatchCreateHeroes(this.$store, createHeroes);
+  }
+
+  public async generateStructures() {
+    const success = await this.$refs.observer.validate();
+    if (!success) {
+      return;
+    }
+    const createStructures: ITaleCreate = {};
+    Object.assign(createStructures, {
+      heroes: this.heroes,
+      log_line: this.logLine,
+      max_tokens: this.maxTokens,
+      temperature: this.temperature,
+      tale_style: this.selectedStyle.abbr,
+    });
+    await dispatchCreateStructures(this.$store, createStructures);
+  }
+
+  public async generateTale() {
+    const success = await this.$refs.observer.validate();
+    if (!success) {
+      return;
+    }
+    const createTale: ITaleCreate = {};
+    Object.assign(createTale, {
+      heroes: this.heroes,
+      log_line: this.logLine,
+      structure: this.structure,
+      max_tokens: this.maxTokens,
+      temperature: this.temperature,
+      tale_style: this.selectedStyle.abbr,
+    });
+    await dispatchCreateTale(this.$store, createTale);
   }
 }
 </script>

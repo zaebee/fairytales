@@ -1,5 +1,5 @@
 <template>
-  <v-stepper-content v-show="stepper > 0" step="1">
+  <v-stepper-content step="1">
     <v-card-text>
       <div class="headline font-weight-light">
         Choose the heroes suitable you and generate portraits.
@@ -16,6 +16,16 @@
           :erase-on-complete="false"
           caret-animation="expand"
         ></vue-typer>
+        <v-btn
+          outlined
+          color="primary"
+          class="float-right"
+          :loading="isLoadingStatus('heroes')"
+          :disabled="isLoadingStatus('heroes')"
+          @click="$emit('generate')"
+        >
+          Regenerate heroes
+        </v-btn>
       </div>
     </v-card-text>
     <v-row class="mb-3">
@@ -66,8 +76,9 @@
       </v-col>
     </v-row>
     <v-btn
+      class="mb-5"
       color="primary"
-      :disabled="invalid || isLoadingStatus('portrait') || !heroes.length"
+      :disabled="invalid || isLoadingStatus('structures') || !heroes.length"
       :loading="isLoadingStatus('structures')"
       @click="generateStructures()"
       >Generate structure
@@ -80,14 +91,12 @@ import { VueTyper } from "vue-typer";
 import { Component, Vue } from "vue-property-decorator";
 import { ITaleCreate, IHero, IHeroPortraitCreate } from "@/interfaces";
 import {
-  dispatchStep,
   dispatchCreateStructures,
   dispatchCreateHeroPortrait,
   dispatchSelectHeroSet,
 } from "@/store/tales/actions";
 import {
   readStatus,
-  readStepper,
   readHeroes,
   readHeroSets,
   readHeroesPortraitsComplete,
@@ -102,14 +111,6 @@ import {
 export default class HeroesComponent extends Vue {
   public selectedHero = -1;
   public selectedHeroSet = -1;
-
-  get stepper() {
-    return readStepper(this.$store);
-  }
-
-  stepperN(step: number) {
-    dispatchStep(this.$store, step);
-  }
 
   get isLoadingStatus() {
     return readStatus(this.$store);

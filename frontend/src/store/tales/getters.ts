@@ -25,9 +25,6 @@ export const getters = {
     );
   },
   readStructures: (state: TalesState) => state.structures,
-  readStructuresHtml: (state: TalesState) => {
-    return state.structures;
-  },
   selectedStructure: (state: TalesState) => {
     if (state.structure) {
       return state.structure;
@@ -52,7 +49,6 @@ export const readStatus = read(getters.readStatus);
 export const readHeroes = read(getters.readHeroes);
 export const readHeroSets = read(getters.readHeroSets);
 export const readStructures = read(getters.readStructures);
-export const readStructuresHtml = read(getters.readStructuresHtml);
 export const readTale = read(getters.readTale);
 export const readStoriesHtml = read(getters.readStoriesHtml);
 

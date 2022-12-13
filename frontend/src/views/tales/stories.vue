@@ -1,10 +1,20 @@
 <template>
-  <v-stepper-content v-show="tale" step="3">
+  <v-stepper-content step="3">
     <v-card-text>
       <div class="headline font-weight-light">
         {{ (tale && tale.title) || "Unknown Title" }}
         <v-btn v-if="!(tale && tale.title)" outlined color="primary" disabled>
           Generate title
+        </v-btn>
+        <v-btn
+          outlined
+          color="primary"
+          class="float-right"
+          :loading="isLoadingStatus('tale')"
+          :disabled="isLoadingStatus('tale')"
+          @click="$emit('generate')"
+        >
+          Regenerate stories
         </v-btn>
       </div>
     </v-card-text>
@@ -22,18 +32,20 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-btn color="primary" :disabled="invalid" @click="finish()">Finish</v-btn>
+    <v-btn class="mb-5" color="primary" :disabled="invalid" @click="finish()"
+      >Finish
+    </v-btn>
   </v-stepper-content>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { dispatchStep } from "@/store/tales/actions";
 import {
   readStatus,
-  readStepper,
   readTale,
+  readHeroes,
   readStoriesHtml,
+  selectedStructure,
 } from "@/store/tales/getters";
 
 @Component({
@@ -42,16 +54,16 @@ import {
 export default class StoriesComponent extends Vue {
   public selectedStory = -1;
 
-  get stepper() {
-    return readStepper(this.$store);
-  }
-
-  set stepper(step: number) {
-    dispatchStep(this.$store, step);
-  }
-
   get isLoadingStatus() {
     return readStatus(this.$store);
+  }
+
+  get heroes() {
+    return readHeroes(this.$store);
+  }
+
+  get structure() {
+    return selectedStructure(this.$store);
   }
 
   get tale() {

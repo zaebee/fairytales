@@ -51,7 +51,6 @@ export const actions = {
   },
   async actionCreateHeroes(context: MainContext, payload) {
     try {
-      commitStepper(context, 0);
       const loadingNotification = { content: "Generating heroes" };
       commitLoadingStatus(context, { heroes: true });
       commitResetTale(context);
