@@ -47,7 +47,8 @@ async def create_heroes(
     logger.info('Passed tale:%s', tale_in)
     tale_prompt = await cohere.TalePrompt.create(tale_in.log_line)
     response = await tale_prompt.get_heroes(
-        'BUN', temperature=tale_in.temperature, max_tokens=tale_in.max_tokens)
+        temperature=tale_in.temperature,
+        max_tokens=tale_in.max_tokens)
     logger.info('Generated heroes:\n %s', response)
     await tale_prompt.close()
     return [schemas.HeroSet(heroes=heroes) for heroes in response]

@@ -9,6 +9,7 @@ class Part(BaseModel):
     id: Optional[int] = None
     name: Optional[str] = None
     text: Optional[str] = None
+    image: Optional[str] = None
 
 
 class Structure(BaseModel):

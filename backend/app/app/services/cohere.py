@@ -8,6 +8,7 @@ import pandas as pd
 from fastapi import HTTPException
 
 from app.services import tales as base_tales
+from app.services.prompts import heroes as heroes_prompt
 
 COHERE_KEY = 'onk1aMdIZZ4P86E99JlD095UEVH7LfIUwwmEF7KQ'
 
@@ -62,7 +63,6 @@ class TalePrompt:
             'temperature': kwargs.get('temperature', 0.555),
             'max_tokens': min([max_tokens, max(200, 8788 - len(prompt))])
         }
-        logger.info('TALES:%s', [tale['name'] for tale in self.tales])
         logger.info(
             'GENERATING for len(prompt)=%s PARAMS:=%s\n', len(prompt), params)
         try:
@@ -98,7 +98,7 @@ class TalePrompt:
         output.append(predict)
         return '\n'.join(output)
 
-    def prompt_text_as_tale(self, text, as_tale) -> str:
+    def prompt_text_as_tale(self, text: str, as_tale: str) -> str:
         """Generates prompt to get tale full text."""
         tales = [tale for tale in self.tales if tale['name'] == as_tale]
         output = [self.HEAD]
@@ -113,8 +113,8 @@ class TalePrompt:
         output.append(predict)
         return '\n'.join(output)
 
-    def prompt_structure_as_tale(self, text, as_tale) -> str:
-        """Generates prompt to predict tale structure similar as given tale."""
+    def prompt_structure_as_tale(self, text: str, as_tale: str) -> str:
+        """Generates prompt to predict tale plots similar as given tale."""
         tales = [tale for tale in self.tales if tale['name'] == as_tale]
         output = [self.HEAD]
         if not tales:
@@ -127,22 +127,21 @@ class TalePrompt:
         output.append(predict)
         return '\n'.join(output)
 
-    def prompt_heroes(self, text: str, as_tale: str = None) -> str:
-        """Builds prompt to get heroes description."""
-        tales = self.tales
-        if as_tale:
-            tales = [tale for tale in base_tales.TALES if tale['name'] == as_tale]
+    def prompt_heroes(self, text: str) -> str:
+        """Builds prompt to get heroes descriptions."""
         output = []
+        tales = [heroes_prompt.RED_HOOD, heroes_prompt.MERMAID]
         for counter, tale in enumerate(tales, 1):
             output.append(self.HEROES.format(
-                counter=counter, text=tale['summary'], heroes=tale['heroes']))
+                counter=counter, text=tale['SUMMARY'], heroes=tale['HEROES']))
         predict = self.HEROES_PREDICT.format(counter=len(tales) + 1, text=text)
         output.append(predict)
         return '\n'.join(output)
 
-    async def get_heroes(self, as_tale: str = None, **kwargs):
+    async def get_heroes(self, **kwargs):
         """Generates heroes names and descriptions."""
-        prompt = self.prompt_heroes(self.line, as_tale)
+        prompt = self.prompt_heroes(self.line)
+        logger.info('Prompt Request:%s', prompt)
         result = await self.generate(prompt, **kwargs)
         output = []
         for idx, gen in enumerate(result['generation'].values):
@@ -169,6 +168,7 @@ class TalePrompt:
         if heroes is not None:
             text.append('\n'.join(self.heroes[heroes]['descriptions']))
         prompt = self.prompt_structure('\n'.join(text))
+        logger.info('Prompt Request:%s', prompt)
         output = await self.generate(prompt, **kwargs)
         for idx, gen in enumerate(output['generation'].values):
             matched = re.search(r'(1\).*?)\n\n', gen, re.DOTALL)
@@ -189,6 +189,7 @@ class TalePrompt:
         if structure is not None:
             text.append(self.structures[structure])
         prompt = self.prompt_text_as_tale('\n'.join(text), as_tale)
+        logger.debug('Prompt Request:%s', prompt)
         if not prompt:
             return ''
         result = await self.generate(prompt, **kwargs)

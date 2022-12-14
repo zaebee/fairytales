@@ -26,14 +26,31 @@ def _clean_prompt(prompt: str) -> str:
 class StabilityPrompt:
     """Implements client to stability service for image generation."""
     STYLES = {
-        'modern': (
+        'MODERN': (
             '{}, d & d, fantasy, intricate, elegant, '
             'highly detailed, digital painting, artstation, concept art, '
             'matte, sharp focus, illustration, hearthstone, art by artgerm '
             'and greg rutkowski and alphonse mucha '),
-        'classic': (
+        'STEAMPUNK': (
             '{}, beautifully lit, steampunk, by rebecca guay, '
-            'by francois schuiten ')
+            'by francois schuiten '),
+        'ELF': (
+            '{}, hand drawn cute gnomes in autumn disguise holding pumpkin '
+            'and maple leaf, detailed, concept art, low angle, high detail, '
+            'warm lighting, volumetric, godrays, vivid, beautiful, trending '
+            'on artstation, by jordan grimmer, huge scene, grass, art greg '
+            'rutkowski '),
+        'BW': (
+            '{}, in the style of h. r. giger, horror, dark, grain, realistic '
+            'lighting, monochromatic '),
+        'XMAS': (
+            '{}, an extremely detailed concept art of a spiritual fantasy jingle '
+            'bell infused with magic, trending on artstation, digital art, '
+            '4 k, intricate, octane render, sharp focus '),
+        'PIXAR': (
+            '{}, a wholesome animation key shot of hogsmeade, colorful, pixar and '
+            'disney animation, sharp, very detailed, high resolution, key '
+            'art by greg rutkowski, bloom, dramatic lighting ')
     }
 
     def __init__(self):
@@ -45,7 +62,7 @@ class StabilityPrompt:
     def _get_style(self, style: str) -> str:
         if style in self.STYLES.keys():
             return self.STYLES[style]
-        return self.STYLES['classic']
+        return self.STYLES['MODERN']
 
     def _slugify(self, text) -> str:
         text = text.translate(self._translate_table)
