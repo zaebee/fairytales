@@ -1,11 +1,12 @@
 import Vue from "vue";
 import Router from "vue-router";
+import VueYandexMetrika from "vue-yandex-metrika-ts";
 
 import RouterComponent from "./components/RouterComponent.vue";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
@@ -122,3 +123,11 @@ export default new Router({
     },
   ],
 });
+
+Vue.use(VueYandexMetrika, {
+  id: 91701398,
+  router: router,
+  env: process.env.NODE_ENV,
+});
+
+export default router;
