@@ -11,8 +11,8 @@
           outlined
           color="primary"
           class="float-right"
-          :disabled="invalid || isLoadingStatus('tale') || !heroes.length"
-          :loading="isLoadingStatus('tale')"
+          :disabled="invalid || isLoading('tale') || !heroes.length"
+          :loading="isLoading('tale')"
           @click="generateTale"
           >Next
           <v-icon>mdi-chevron-right</v-icon>
@@ -20,7 +20,8 @@
       </v-col>
     </v-row>
     <v-fade-transition>
-      <v-overlay absolute="absolute" opacity="0.38" :value="isLoadingStatus('tale')">
+      <v-overlay absolute="absolute" opacity="0.38" :value="isLoading('tale')">
+        <v-progress-circular indeterminate size="64" />
       </v-overlay>
     </v-fade-transition>
     <v-row>
@@ -34,11 +35,11 @@
           <v-window v-model="selectedPlotSet">
             <v-window-item v-for="(plotSet, i) in plotSets" :key="i">
               <v-card-actions class="justify-space-between">
-                <v-btn text :disabled="isLoadingStatus('image')" @click="prev">
+                <v-btn text :disabled="isLoading('image')" @click="prev">
                   <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
                 <v-card-title>Plots</v-card-title>
-                <v-btn text :disabled="isLoadingStatus('image')" @click="next">
+                <v-btn text :disabled="isLoading('image')" @click="next">
                   <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
               </v-card-actions>
@@ -68,8 +69,8 @@
         <v-btn
           class="float-right"
           color="primary"
-          :disabled="invalid || selectedPlotSet < 0 || isLoadingStatus('tale')"
-          :loading="isLoadingStatus('tale')"
+          :disabled="invalid || selectedPlotSet < 0 || isLoading('tale')"
+          :loading="isLoading('tale')"
           @click="generateTale"
           >Next
           <v-icon>mdi-chevron-right</v-icon>
@@ -126,7 +127,7 @@ export default class StructuresComponent extends Vue {
         ? this.plotSets.length - 1
         : this.selectedPlotSet - 1;
   }
-  get isLoadingStatus() {
+  get isLoading() {
     return readStatus(this.$store);
   }
 

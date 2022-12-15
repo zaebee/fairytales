@@ -5,8 +5,8 @@
         <v-select
           v-model="filters.selected_style"
           :items="filters.styles"
-          label="Tale style"
-          hint="Generate your tale in specified style"
+          label="Illustration style"
+          hint="Generate images in the specified style"
           item-text="name"
           item-value="abbr"
           return-object

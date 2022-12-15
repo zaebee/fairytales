@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :loading="isLoadingStatus('portrait') && isHeroSelected(hero)"
+    :loading="isLoading('portrait') && isHeroSelected(hero)"
     class="mb-5"
     outlined
     tile
@@ -19,7 +19,7 @@
       <v-btn
         text
         color="blue"
-        :loading="isLoadingStatus('portrait') && isHeroSelected(hero)"
+        :loading="isLoading('portrait') && isHeroSelected(hero)"
         @click="generatePortrait(hero)"
         >Generate portrait
       </v-btn>
@@ -43,7 +43,7 @@ import { readStatus } from "@/store/tales/getters";
   },
 })
 export default class HeroComponent extends Vue {
-  get isLoadingStatus() {
+  get isLoading() {
     return readStatus(this.$store);
   }
 

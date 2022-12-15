@@ -1,16 +1,26 @@
 <template>
   <v-stepper-content step="1">
     <v-row>
-      <v-col cols="9">
-        <div class="text-md-h4 font-weight-light mb-7">
+      <v-col cols="12">
+        <div class="text-md-h4 font-weight-light mb-3">
           Choose heroes suitable for you and generate portraits.
         </div>
       </v-col>
-      <v-col cols="3">
+    </v-row>
+    <v-fade-transition>
+      <v-overlay absolute="absolute" opacity="0.38" :value="loading">
+        <v-progress-circular indeterminate size="64" />
+      </v-overlay>
+    </v-fade-transition>
+    <v-row>
+      <v-col cols="12" md="4">
+        <v-card class="mx-auto" outlined>
+          <hero-window-component :filters="filters" />
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="4">
         <v-btn
-          outlined
           color="primary"
-          class="float-right"
           :disabled="invalid || loading || !heroes.length"
           :loading="loading"
           @click="generatePlots"
@@ -19,21 +29,10 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-fade-transition>
-      <v-overlay absolute="absolute" opacity="0.38" :value="loading" />
-    </v-fade-transition>
     <v-row>
-      <v-col cols="12" md="4">
-        <v-card class="mx-auto" outlined>
-          <hero-window-component :filters="filters" />
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
+      <v-col cols="12" class="d-none d-md-block">
         <v-btn
           color="primary"
-          class="float-right"
           :disabled="invalid || loading || !heroes.length"
           :loading="loading"
           @click="generatePlots"

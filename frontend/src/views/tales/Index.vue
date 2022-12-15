@@ -17,17 +17,17 @@
               <v-form class="ma-5">
                 <v-textarea
                   v-model="logLine"
-                  required
                   :error-messages="errors"
+                  :placeholder="placeholder"
                   label="Write a short log line for your tale"
-                  placeholder="For example, A funny tale about two girls: Sasha and Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches"
+                  required
                 ></v-textarea>
                 <v-btn
                   outlined
                   class="mt-5"
                   color="primary"
-                  :disabled="invalid || isLoadingStatus('heroes')"
-                  :loading="isLoadingStatus('heroes')"
+                  :disabled="invalid || isLoading('heroes')"
+                  :loading="isLoading('heroes')"
                   @click="generateCharacters"
                   >Try it
                 </v-btn>
@@ -76,12 +76,8 @@
               @generate="generateStructures"
             />
             <stories-component
-              :invalid="valid"
+              :invalid="invalid"
               :log-line="logLine"
-              :filters="filters"
-              :max-tokens="filters.max_tokens"
-              :temperature="filters.temperature"
-              :tale-style="filters.selected_style"
               @generate="generateTale"
             />
           </v-stepper-items>
@@ -135,6 +131,8 @@ export default class Tales extends Vue {
     observer: InstanceType<typeof ValidationObserver>;
   };
 
+  public placeholder =
+    "For example, A funny tale about two girls: Sasha and Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches";
   public valid = true;
   public logLine = "";
   public filters: IFilter = {
@@ -171,7 +169,7 @@ export default class Tales extends Vue {
     return selectedStructure(this.$store);
   }
 
-  get isLoadingStatus() {
+  get isLoading() {
     return readStatus(this.$store);
   }
 
@@ -180,7 +178,6 @@ export default class Tales extends Vue {
     if (!success) {
       return;
     }
-
     const createHeroes: ITaleCreate = {
       log_line: this.logLine,
       max_tokens: this.filters.max_tokens,
@@ -222,9 +219,3 @@ export default class Tales extends Vue {
   }
 }
 </script>
-
-<style>
-.v-card--disabled {
-  opacity: 0.25;
-}
-</style>

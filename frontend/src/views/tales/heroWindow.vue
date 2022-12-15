@@ -3,11 +3,11 @@
     <v-window v-model="selectedHeroSet">
       <v-window-item v-for="(heroSet, i) in heroSets" :key="i">
         <v-card-actions class="justify-space-between">
-          <v-btn text :disabled="isLoadingStatus('portrait')" @click="prev">
+          <v-btn text :disabled="isLoading('portrait')" @click="prev">
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
           <v-card-title>Heroes</v-card-title>
-          <v-btn text :disabled="isLoadingStatus('portrait')" @click="next">
+          <v-btn text :disabled="isLoading('portrait')" @click="next">
             <v-icon>mdi-chevron-right</v-icon>
           </v-btn>
         </v-card-actions>
@@ -70,7 +70,7 @@ export default class HeroWindowComponent extends Vue {
         : this.selectedHeroSet - 1;
   }
 
-  get isLoadingStatus() {
+  get isLoading() {
     return readStatus(this.$store);
   }
 

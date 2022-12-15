@@ -1,25 +1,26 @@
 <template>
   <v-stepper-content step="3">
-    <v-card-text>
-      <div class="headline font-weight-light">
-        {{ (tale && tale.title) || "Unknown Title" }}
-        <v-btn v-if="!(tale && tale.title)" outlined color="primary" disabled>
-          Generate title
-        </v-btn>
+    <v-row>
+      <v-col cols="9">
+        <div class="text-md-h4 font-weight-light mb-7">
+          {{ (tale && tale.title) || "Unknown Title" }}
+        </div>
+      </v-col>
+      <v-col cols="3">
         <v-btn
           outlined
           color="primary"
           class="float-right"
-          :loading="isLoadingStatus('tale')"
-          :disabled="isLoadingStatus('tale')"
+          :loading="isLoading('tale')"
+          :disabled="isLoading('tale')"
           @click="$emit('generate')"
         >
           Regenerate stories
         </v-btn>
-      </div>
-    </v-card-text>
+      </v-col>
+    </v-row>
     <v-fade-transition>
-      <v-overlay absolute="absolute" opacity="0.38" :value="isLoadingStatus('tale')">
+      <v-overlay absolute="absolute" opacity="0.38" :value="isLoading('tale')">
       </v-overlay>
     </v-fade-transition>
     <v-row v-if="tale" class="mb-3">
@@ -53,12 +54,15 @@ import {
 } from "@/store/tales/getters";
 
 @Component({
-  props: ["invalid", "logLine", "maxTokens", "temperature", "taleStyle"],
+  props: {
+    logLine: { type: String },
+    invalid: { type: Boolean },
+  },
 })
 export default class StoriesComponent extends Vue {
   public selectedStory = -1;
 
-  get isLoadingStatus() {
+  get isLoading() {
     return readStatus(this.$store);
   }
 
