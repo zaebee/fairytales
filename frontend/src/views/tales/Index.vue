@@ -139,11 +139,8 @@ export default class Tales extends Vue {
   public logLine = "";
   public filters: IFilter = {
     max_tokens: 500,
-    temperature: 0.5,
-    selected_style: {
-      name: "Modern",
-      abbr: "MODERN",
-    },
+    temperature: 0.4,
+    selected_style: { name: "SteamPunk", abbr: "STEAMPUNK" },
     styles: [
       { name: "Modern", abbr: "MODERN" },
       { name: "SteamPunk", abbr: "STEAMPUNK" },

@@ -1,6 +1,5 @@
 import Vue from "vue";
 import Router from "vue-router";
-import VueYandexMetrika from "vue-yandex-metrika-ts";
 
 import RouterComponent from "./components/RouterComponent.vue";
 
@@ -122,12 +121,6 @@ const router = new Router({
       redirect: "/",
     },
   ],
-});
-
-Vue.use(VueYandexMetrika, {
-  id: 91701398,
-  router: router,
-  env: process.env.NODE_ENV,
 });
 
 export default router;
