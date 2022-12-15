@@ -24,7 +24,7 @@ class TalePrompt:
             '"Morphology of a fairy tale" structutre.\n')
 
     SAMPLE = 'Example {counter}.\n{text}\n\n<scenes>\n{predict}\n\n<end>\n'
-    SAMPLE_PREDICT = 'Example {counter}. \n{text}\n\n<scenes>'
+    SAMPLE_PREDICT = 'Example {counter}. \nSummary: {text}\n\n<scenes>'
 
     HEROES = ('Example {counter}.\n{text}\nCharacters and descriptions:'
               '\n{heroes}\n<end>')
@@ -103,13 +103,15 @@ class TalePrompt:
         """Generates prompt to get tale full text."""
         parts = ''
         data = {
-            'audience': 'children',
             'name': self.line,
             'heroes': '',
+            'heroes_descriptions': '',
+            'audience': 'children',
         }
         if heroes is not None:
             logger.info(self.heroes)
             data['heroes'] = ', '.join(self.heroes[heroes]['names'])
+            data['heroes_desc'] = '\n'.join(self.heroes[heroes]['descriptions'])
         if structure is not None:
             parts = '\n'.join(self.structures[structure])
         return tale_prompt.INTRO.format(parts, **data)
@@ -156,7 +158,7 @@ class TalePrompt:
 
     async def get_heroes(self, **kwargs):
         """Generates heroes names and descriptions."""
-        prompt = self.prompt_heroes(self.line)
+        prompt = self.prompt_heroes(f'Summary: {self.line}')
         logger.info('Prompt Request:%s', prompt)
         result = await self.generate(prompt, **kwargs)
         output = []

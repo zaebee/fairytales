@@ -3,13 +3,21 @@ This program will generate multiple paragraphs for a fairy tale given the title,
 
 <end>
 
-Tale: Little Red Cap
+Title: Little Red Cap
 Audience: children
-Characters: Little Red Cap, The wolf, Mother, Grandma, lumberjacks
-ABSENTATION: Little Red Cap leaves her house for her Grandma
-INTERDICTION: Mother punishes Little Red Cap so that she, going to her Grandma, does not leave the path
-VIOLATION: Little Red Cap leaves the path to collect flowers
-RECONNAISSANCE: The wolf asks Little Red Cap where she is going and where her Grandma lives
+Characters: Little Red Cap, The wolf, Mother, Grandma, Lumberjacks
+Characters descriptions:
+Red Riding Hood is a little girl who got her nickname because of her beanie. A good, little girl lives with her mother. She didn’t listen to mother’s advice and went to my grandmother through the forest.
+Wolf is the negative hero, dangerous predator. An evil and bloodthirsty beast, a cunning and clever deceiver. A greedy and insatiable predator, through cunning and deceit, found out my grandmother's address.
+Mother is the working middle-aged woman. A caring woman, worried about her mother's health, sends gifts to her.
+Grandma is the  old sick woman. A helpless old woman who loves her granddaughter very much. She does not hear and see well, so she falls for the deception of the wolf.
+Lumberjacks are workers who are engaged in logging. Courageous and strong lumberjacks who were passing by heard a noise, jumped into the hut and killed the wolf, freed the grandmother and granddaughter from his belly.
+
+Plots:
+ABSENTATION: Little Red Cap leaves her house for her Grandma.
+INTERDICTION: Mother punishes Little Red Cap so that she, going to her Grandma, does not leave the path.
+VIOLATION: Little Red Cap leaves the path to collect flowers.
+RECONNAISSANCE: The wolf asks Little Red Cap where she is going and where her Grandma lives.
 
 <First Paragraph>: Once upon a time there was a sweet little girl.
 Everyone who saw her liked her, but most of all her grandmother, who did not know what to give the child next.
@@ -36,8 +44,11 @@ Little Red Cap promised to obey her mother. The grandmother lived out in the woo
 
 <end>
 
-Tale: {name}
+Title: {name}
 Audience: {audience}
 Characters: {heroes}
+Characters descriptions:
+{heroes_desc}
+Plots:
 {}
 <First Paragraph>:"""
