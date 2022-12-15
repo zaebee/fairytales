@@ -7,9 +7,10 @@ import cohere
 import pandas as pd
 from fastapi import HTTPException
 
-from app.services import tales as base_tales
 from app.services.prompts import heroes as heroes_prompt
+from app.services.prompts import plots as plots_prompt
 from app.services.prompts import tale as tale_prompt
+from app.services.prompts import title as title_prompt
 from app.core.config import settings
 
 logger = logging.getLogger('uvicorn')
@@ -30,23 +31,20 @@ class TalePrompt:
               '\n{heroes}\n<end>')
     HEROES_PREDICT = 'Example {counter}.\n{text}\nCharacters and descriptions:'
 
-    def __init__(self, line, as_tale=None, **kwargs):
-        _tales = [tale for tale in base_tales.TALES if tale['name'] != 'BUN']
+    def __init__(self, line, **kwargs):
         self.client = None
         self.heroes = {}
         self.structures = {}
         self.line = line
-        self.as_tale = as_tale
-        self.tales = kwargs.get('tales', _tales)
 
     async def close(self):
         """Closes connection."""
         await self.client.close_connection()
 
     @classmethod
-    async def create(cls, line, as_tale: str = None, **kwargs):
+    async def create(cls, line, **kwargs):
         """Initializes async client."""
-        self = cls(line, as_tale, **kwargs)
+        self = cls(line, **kwargs)
         self.client = await cohere.AsyncClient.create(API_KEY)
         return self
 
@@ -62,7 +60,7 @@ class TalePrompt:
             'num_generations': kwargs.get('num_generations', 3),
             'temperature': kwargs.get('temperature', 0.555),
             'max_tokens': min([max_tokens, max(200, 8788 - len(prompt))]),
-            'presence_penalty': 0.618,
+            'presence_penalty': 0.33,
         }
         logger.info(
             'GENERATING for len(prompt)=%s PARAMS:=%s\n', len(prompt), params)
@@ -87,15 +85,16 @@ class TalePrompt:
         data = data.sort_values('likelihood', ascending=False, ignore_index=True)
         return data
 
-    def prompt_structure(self, text) -> str:
-        """Generates prompt to get tale structure."""
+    def prompt_plots(self, text) -> str:
+        """Generates prompt to get tale plots."""
         output = [self.HEAD]
-        for counter, tale in enumerate(self.tales, 1):
+        tales = [plots_prompt.RED_HOOD, plots_prompt.MERMAID]
+        for counter, tale in enumerate(tales, 1):
             sample = self.SAMPLE.format(
-                counter=counter, text=tale['summary'], predict=tale['struct'])
+                counter=counter, text=tale['summary'], predict=tale['plots'])
             output.append(sample)
         predict = self.SAMPLE_PREDICT.format(
-            counter=len(self.tales) + 1, text=text)
+            counter=len(tales) + 1, text=text)
         output.append(predict)
         return '\n'.join(output)
 
@@ -116,35 +115,6 @@ class TalePrompt:
             parts = '\n'.join(self.structures[structure])
         return tale_prompt.INTRO.format(parts, **data)
 
-    def prompt_text_as_tale(self, text: str, as_tale: str) -> str:
-        """Generates prompt to get tale full text."""
-        tales = [tale for tale in self.tales if tale['name'] == as_tale]
-        output = [self.HEAD]
-        if not tales:
-            return ''
-        for counter, tale in enumerate(tales, 1):
-            summary = '\n'.join([tale['summary'], tale['struct']])
-            sample = self.SAMPLE.format(
-                counter=counter, text=summary, predict=tale['text'])
-            output.append(sample)
-        predict = self.SAMPLE_PREDICT.format(counter=len(tales) + 1, text=text)
-        output.append(predict)
-        return '\n'.join(output)
-
-    def prompt_structure_as_tale(self, text: str, as_tale: str) -> str:
-        """Generates prompt to predict tale plots similar as given tale."""
-        tales = [tale for tale in self.tales if tale['name'] == as_tale]
-        output = [self.HEAD]
-        if not tales:
-            return ''
-        for counter, tale in enumerate(tales, 1):
-            sample = self.SAMPLE.format(
-                counter=counter, text=tale['text'], predict=tale['struct'])
-            output.append(sample)
-        predict = self.SAMPLE_PREDICT.format(counter=len(tales) + 1, text=text)
-        output.append(predict)
-        return '\n'.join(output)
-
     def prompt_heroes(self, text: str) -> str:
         """Builds prompt to get heroes descriptions."""
         output = []
@@ -155,6 +125,14 @@ class TalePrompt:
         predict = self.HEROES_PREDICT.format(counter=len(tales) + 1, text=text)
         output.append(predict)
         return '\n'.join(output)
+
+    async def get_title(self, **kwargs):
+        """Generates tale title."""
+        prompt = title_prompt.TITLE.format(self.line)
+        logger.info('Prompt Request:%s', prompt)
+        result = await self.generate(prompt, **kwargs)
+        for title in result['generation'].values:
+            return title
 
     async def get_heroes(self, **kwargs):
         """Generates heroes names and descriptions."""
@@ -185,7 +163,7 @@ class TalePrompt:
         text = [self.line]
         if heroes is not None:
             text.append('\n'.join(self.heroes[heroes]['descriptions']))
-        prompt = self.prompt_structure('\n'.join(text))
+        prompt = self.prompt_plots('\n'.join(text))
         logger.info('Prompt Request:%s', prompt)
         output = await self.generate(prompt, **kwargs)
         for idx, gen in enumerate(output['generation'].values):

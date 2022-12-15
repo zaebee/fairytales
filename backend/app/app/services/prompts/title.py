@@ -32,5 +32,5 @@ the boiling water. The children found treasure at the house. They took it home
 and they were never hungry again.
 Title: Hansel and Gretel <end>
 
-Example 5. {LOG_LINE}
+Example 5. {log_line}
 Title:"""

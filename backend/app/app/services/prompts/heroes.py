@@ -2,11 +2,8 @@
 
 RED_HOOD = {
     'SUMMARY': '''
-Title: The Red Riding Hood.'
-Summary:The tale tells of a young girl in a red cap who walks through a dark
-forest to her grandmother\'s house. When she arrives, she discovers
-that the wolf has taken her grandmother\'s place, trying to trick
-the girl and eventually eat her.''',
+Title: The Red Riding Hood.
+Summary:The tale tells of a young girl in a red cap who walks through a dark forest to her grandmother\'s house. When she arrives, she discovers that the wolf has taken her grandmother\'s place, trying to trick the girl and eventually eat her.''',
     'HEROES': '''
 <character> Red Riding Hood <description> Red Riding Hood is a little girl who got her nickname because of her beanie. A good, little girl lives with her mother. She didn’t listen to mother’s advice and went to my grandmother through the forest. <stop>
 <character> Wolf <description> Wolf is the negative hero, dangerous predator.
