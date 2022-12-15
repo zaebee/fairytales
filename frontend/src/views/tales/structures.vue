@@ -110,7 +110,6 @@ export default class StructuresComponent extends Vue {
 
   @Watch("selectedPlotSet")
   onPlotSetChanged(newVal) {
-    console.log("PlotSet changed", newVal);
     if (this.plotSets.length) {
       dispatchSelectStructure(this.$store, newVal);
     }
@@ -148,7 +147,6 @@ export default class StructuresComponent extends Vue {
   }
 
   public selectPlot(id: number) {
-    console.log(id);
     this.selectedPlot = id;
   }
 

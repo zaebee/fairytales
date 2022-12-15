@@ -53,7 +53,6 @@ export default class HeroWindowComponent extends Vue {
 
   @Watch("selectedHeroSet")
   onHeroSetChanged(newVal) {
-    console.log("HeroSet changed", newVal);
     if (this.heroSets.length) {
       dispatchSelectHeroSet(this.$store, newVal);
     }
@@ -80,7 +79,6 @@ export default class HeroWindowComponent extends Vue {
   }
 
   public selectHero(id: number) {
-    console.log(id);
     this.selectedHero = id;
   }
 }
