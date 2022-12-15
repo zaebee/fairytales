@@ -20,7 +20,7 @@
                   required
                   :error-messages="errors"
                   label="Write a short log line for your tale"
-                  placeholder="For example, A funny tale about two girls: Sasha wand Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches. They study magic, but all the time they do good deeds and because of this, they get into funny situations."
+                  placeholder="For example, A funny tale about two girls: Sasha and Monica, who discovered that the Wicked Witch with a magic Candle wants to kidnap them to make them witches"
                 ></v-textarea>
                 <v-btn
                   outlined
@@ -136,8 +136,7 @@ export default class Tales extends Vue {
   };
 
   public valid = true;
-  public logLine =
-    "A magical story about the elf Zae and the a bee named Moo. How they went into a dark forest and saw an evil owl that showed them a deep river where an underwater witch lived. The witch wanted to drag the elves to the bottom, but she did not succeed.";
+  public logLine = "";
   public filters: IFilter = {
     max_tokens: 500,
     temperature: 0.5,
