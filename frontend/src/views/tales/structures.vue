@@ -20,91 +20,84 @@
       </v-col>
     </v-row>
     <v-fade-transition>
-      <v-overlay
-        absolute="absolute"
-        opacity="0.38"
-        :value="isLoadingStatus('structures')"
-      >
+      <v-overlay absolute="absolute" opacity="0.38" :value="isLoadingStatus('tale')">
       </v-overlay>
     </v-fade-transition>
     <v-row>
-      <v-col v-for="(struct, i) in structures" :key="i" cols="12" md="4">
-        <v-card class="mx-auto" :class="{ selected: selectedStruct == i }" outlined>
-          <v-card-actions>
-            <v-btn
-              :color="selectedStruct == i ? 'success' : 'primary'"
-              :outlined="selectedStruct == i ? false : true"
-              @click="selectStruct(i)"
-            >
-              <span>
-                {{ selectedStruct == i ? "Selected plots" : "Select plots" }}
-              </span>
-            </v-btn>
-          </v-card-actions>
-          <v-container>
-            <v-row dense>
-              <v-col cols="12">
-                <v-card
-                  v-for="(part, index) in struct.parts"
-                  :key="index"
-                  :disabled="selectedStruct != i"
-                  class="mb-5"
-                  outlined
-                  tile
-                >
-                  <v-img
-                    v-if="part.image"
-                    :src="part.image.path"
-                    class="grey darken-4 white--text align-end fill-height"
-                    aspect-ratio="1.7"
-                    contain
-                  >
-                  </v-img>
-                  <v-card-title>{{ part.name }}</v-card-title>
-                  <v-card-text class="text--primary">{{ part.text }}</v-card-text>
-                  <v-card-actions>
-                    <v-btn
-                      text
-                      color="blue"
-                      :loading="isLoadingStatus('image') && isPartSelected(i, part)"
-                      @click="generateImage(part)"
-                      >Generate illustration
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-container>
+      <v-col cols="12" md="4">
+        <v-card class="mx-auto" outlined>
+          <hero-window-component :filters="filters" :hero-sets="heroSets" />
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-card class="mx-auto" outlined>
+          <v-window v-model="selectedPlotSet">
+            <v-window-item v-for="(plotSet, i) in plotSets" :key="i">
+              <v-card-actions class="justify-space-between">
+                <v-btn text :disabled="isLoadingStatus('image')" @click="prev">
+                  <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <v-card-title>Plots</v-card-title>
+                <v-btn text :disabled="isLoadingStatus('image')" @click="next">
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+              </v-card-actions>
+              <v-container>
+                <v-row dense>
+                  <v-col cols="12">
+                    <plot-component
+                      v-for="plot in plotSet.parts"
+                      :key="plot.id"
+                      :plot="plot"
+                      :plot-set="i"
+                      :filters="filters"
+                      :selected-plot="selectedPlot"
+                      :selected-plot-set="selectedPlotSet"
+                      @select="selectPlot"
+                    />
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-window-item>
+          </v-window>
         </v-card>
       </v-col>
     </v-row>
-    <v-btn
-      class="mb-5"
-      color="primary"
-      :disabled="invalid || selectedStruct < 0 || isLoadingStatus('tale')"
-      :loading="isLoadingStatus('tale')"
-      @click="generateTale"
-      >Generate tale
-    </v-btn>
+    <v-row>
+      <v-col cols="12">
+        <v-btn
+          class="float-right"
+          color="primary"
+          :disabled="invalid || selectedPlotSet < 0 || isLoadingStatus('tale')"
+          :loading="isLoadingStatus('tale')"
+          @click="generateTale"
+          >Next
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-stepper-content>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { IPart, ITaleCreate, IStructImageCreate, IFilter } from "@/interfaces";
-import {
-  dispatchCreateTale,
-  dispatchCreateStructImage,
-  dispatchSelectStructure,
-} from "@/store/tales/actions";
+import { Component, Vue, Watch } from "vue-property-decorator";
+import { ITaleCreate, IFilter } from "@/interfaces";
+import { dispatchCreateTale, dispatchSelectStructure } from "@/store/tales/actions";
 import {
   readStatus,
   readHeroes,
+  readHeroSets,
   readStructures,
   selectedStructure,
 } from "@/store/tales/getters";
+import PlotComponent from "./plot.vue";
+import HeroWindowComponent from "./heroWindow.vue";
 
 @Component({
+  components: {
+    PlotComponent,
+    HeroWindowComponent,
+  },
   props: {
     logLine: { type: String },
     invalid: { type: Boolean },
@@ -112,9 +105,28 @@ import {
   },
 })
 export default class StructuresComponent extends Vue {
-  public selectedStruct = -1;
-  public selectedPart = -1;
+  public selectedPlot = -1;
+  public selectedPlotSet = 0;
 
+  @Watch("selectedPlotSet")
+  onPlotSetChanged(newVal) {
+    console.log("PlotSet changed", newVal);
+    if (this.plotSets.length) {
+      dispatchSelectStructure(this.$store, newVal);
+    }
+  }
+
+  next() {
+    this.selectedPlotSet =
+      this.selectedPlotSet + 1 === this.plotSets.length ? 0 : this.selectedPlotSet + 1;
+  }
+
+  prev() {
+    this.selectedPlotSet =
+      this.selectedPlotSet - 1 < 0
+        ? this.plotSets.length - 1
+        : this.selectedPlotSet - 1;
+  }
   get isLoadingStatus() {
     return readStatus(this.$store);
   }
@@ -123,7 +135,11 @@ export default class StructuresComponent extends Vue {
     return readHeroes(this.$store);
   }
 
-  get structures() {
+  get heroSets() {
+    return readHeroSets(this.$store);
+  }
+
+  get plotSets() {
     return readStructures(this.$store);
   }
 
@@ -131,28 +147,13 @@ export default class StructuresComponent extends Vue {
     return selectedStructure(this.$store);
   }
 
-  isPartSelected(indexStruct: number, part: IPart) {
-    return this.selectedStruct == indexStruct && this.selectedPart == part.id;
-  }
-
-  public selectStruct(index: number) {
-    this.selectedStruct = this.selectedStruct == index ? -1 : index;
-    dispatchSelectStructure(this.$store, this.selectedStruct);
+  public selectPlot(id: number) {
+    console.log(id);
+    this.selectedPlot = id;
   }
 
   public generate() {
-    this.selectedStruct = -1;
     this.$emit("generate");
-  }
-
-  public async generateImage(part: IPart) {
-    this.selectedPart = part.id;
-    const createStructImage: IStructImageCreate = {
-      prompt: part.text,
-      scene_id: part.id,
-      style: this.filters.selected_style.abbr,
-    };
-    await dispatchCreateStructImage(this.$store, createStructImage);
   }
 
   public async generateTale() {

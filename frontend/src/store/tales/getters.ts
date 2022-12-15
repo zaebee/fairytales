@@ -25,11 +25,7 @@ export const getters = {
     );
   },
   readStructures: (state: TalesState) => state.structures,
-  selectedStructure: (state: TalesState) => {
-    if (state.structure) {
-      return state.structure;
-    }
-  },
+  selectedStructure: (state: TalesState) => state.structure,
   readTale: (state: TalesState) => state.tale,
   readStoriesHtml: (state: TalesState) => {
     if (!state.tale) {

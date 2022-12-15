@@ -42,27 +42,27 @@
       <v-expand-transition>
         <v-stepper v-model="stepper" tile outlined>
           <v-stepper-header>
-            <v-stepper-step :complete="stepper > 0" :editable="heroSets" step="1">
+            <v-stepper-step :complete="stepper > 0" step="1">
               Heroes
-              <small>Create heroes of your story</small>
+              <small>Creates heroes of your story</small>
             </v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step :complete="stepper > 1" :editable="structures" step="2">
-              Structures
-              <small>Create main plots and beats for story</small>
+            <v-stepper-step :complete="stepper > 1" step="2">
+              Plots
+              <small>Creates main plots and beats for story</small>
             </v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step :complete="stepper > 2" :editable="tale" step="3">
+            <v-stepper-step :complete="stepper > 2" step="3">
               Stories
               <small>Customize you final story</small>
             </v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step :complete="stepper > 3" :editable="stepper > 3" step="4">
+            <v-stepper-step :complete="stepper > 3" step="4">
               Share with friends
               <small>Send story to your children</small>
             </v-stepper-step>
           </v-stepper-header>
-          <v-stepper-items>
+          <v-stepper-items v-show="heroSets">
             <heroes-component
               :invalid="invalid"
               :log-line="logLine"
@@ -100,10 +100,8 @@ import { ITaleCreate, IFilter } from "@/interfaces";
 import {
   readStatus,
   readStepper,
-  readTale,
   readHeroes,
   readHeroSets,
-  readStructures,
   selectedStructure,
 } from "@/store/tales/getters";
 import {
@@ -170,20 +168,11 @@ export default class Tales extends Vue {
   }
 
   get heroSets() {
-    return readHeroSets(this.$store).length > 0;
-  }
-
-  get structures() {
-    return readStructures(this.$store).length > 0;
+    return readHeroSets(this.$store).length;
   }
 
   get structure() {
     return selectedStructure(this.$store);
-  }
-
-  get tale() {
-    const tale = readTale(this.$store);
-    return tale && tale.stories.length > 0;
   }
 
   get isLoadingStatus() {

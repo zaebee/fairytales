@@ -48,6 +48,7 @@ export const actions = {
   },
   async actionCreateHeroes(context: MainContext, payload) {
     try {
+      commitStepper(context, 0);
       const loadingNotification = { content: "Generating heroes" };
       commitLoadingStatus(context, { heroes: true });
       commitAddNotification(context, loadingNotification);
@@ -59,6 +60,7 @@ export const actions = {
       )[0];
       commitStepper(context, 1);
       commitSetHeroes(context, response.data);
+      commitSelectHeroSet(context, 0);
       commitLoadingStatus(context, { heroes: false });
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, {
@@ -104,6 +106,7 @@ export const actions = {
       )[0];
       commitStepper(context, 2);
       commitSetStructures(context, response.data);
+      commitSelectStructure(context, 0);
       commitLoadingStatus(context, { structures: false });
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, {
