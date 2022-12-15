@@ -9,6 +9,7 @@ from fastapi import HTTPException
 
 from app.services import tales as base_tales
 from app.services.prompts import heroes as heroes_prompt
+from app.services.prompts import tale as tale_prompt
 
 COHERE_KEY = 'onk1aMdIZZ4P86E99JlD095UEVH7LfIUwwmEF7KQ'
 
@@ -61,7 +62,8 @@ class TalePrompt:
             'stop_sequences': stop_sequences or ['<end>'],
             'num_generations': kwargs.get('num_generations', 3),
             'temperature': kwargs.get('temperature', 0.555),
-            'max_tokens': min([max_tokens, max(200, 8788 - len(prompt))])
+            'max_tokens': min([max_tokens, max(200, 8788 - len(prompt))]),
+            'presence_penalty': 0.618,
         }
         logger.info(
             'GENERATING for len(prompt)=%s PARAMS:=%s\n', len(prompt), params)
@@ -97,6 +99,21 @@ class TalePrompt:
             counter=len(self.tales) + 1, text=text)
         output.append(predict)
         return '\n'.join(output)
+
+    def prompt_text_intro(self, structure: int, heroes: int) -> str:
+        """Generates prompt to get tale full text."""
+        parts = ''
+        data = {
+            'audience': 'children',
+            'name': self.line,
+            'heroes': '',
+        }
+        if heroes is not None:
+            logger.info(self.heroes)
+            data['heroes'] = ', '.join(self.heroes[heroes]['names'])
+        if structure is not None:
+            parts = '\n'.join(self.structures[structure])
+        return tale_prompt.INTRO.format(parts, **data)
 
     def prompt_text_as_tale(self, text: str, as_tale: str) -> str:
         """Generates prompt to get tale full text."""
@@ -180,16 +197,10 @@ class TalePrompt:
         return self.structures
 
     async def get_tale(
-            self, as_tale: str, structure: int = None, heroes: int = None,
-            **kwargs):
+        self, structure: int = None, heroes: int = None, **kwargs):
         """Generates final tale text for given heroes and structure."""
-        text = [self.line]
-        if heroes is not None:
-            text.append('\n'.join(self.heroes[heroes]['descriptions']))
-        if structure is not None:
-            text.append(self.structures[structure])
-        prompt = self.prompt_text_as_tale('\n'.join(text), as_tale)
-        logger.debug('Prompt Request:%s', prompt)
+        prompt = self.prompt_text_intro(structure, heroes)
+        logger.info('Prompt Request:%s', prompt)
         if not prompt:
             return ''
         result = await self.generate(prompt, **kwargs)

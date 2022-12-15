@@ -3,13 +3,14 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.schemas import hero
+from app.schemas import image as img
 
 
 class Part(BaseModel):
     id: Optional[int] = None
     name: Optional[str] = None
     text: Optional[str] = None
-    image: Optional[str] = None
+    image: Optional[img.SceneCreate] = None
 
 
 class Structure(BaseModel):
