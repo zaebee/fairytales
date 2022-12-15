@@ -24,6 +24,8 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
+    STABILITY_KEY: str
+    COHERE_KEY: str
     PROJECT_NAME: str
     SENTRY_DSN: Optional[HttpUrl] = None
 

@@ -8,9 +8,8 @@ import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 
 from app.core.config import settings
 
-
 logger = logging.getLogger('uvicorn')
-STABILITY_KEY = 'sk-kKDdwGtHoPO4kiOSWQck3D1TEaBRRAVMUPhdKyHUN9A0DVH3'
+API_KEY = settings.STABILITY_KEY
 
 NON_URL_SAFE = [
     '"', '#', '$', '%', '&', '+',
@@ -56,8 +55,7 @@ class StabilityPrompt:
     def __init__(self):
         logger.info('Init stability with server HOST: %s', settings.SERVER_HOST)
         self._translate_table = {ord(char): '' for char in NON_URL_SAFE}
-        self.client = client.StabilityInference(
-            key=STABILITY_KEY, verbose=True,)
+        self.client = client.StabilityInference(key=API_KEY, verbose=True)
 
     def _get_style(self, style: str) -> str:
         if style in self.STYLES.keys():

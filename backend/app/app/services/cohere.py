@@ -10,12 +10,11 @@ from fastapi import HTTPException
 from app.services import tales as base_tales
 from app.services.prompts import heroes as heroes_prompt
 from app.services.prompts import tale as tale_prompt
+from app.core.config import settings
 
-COHERE_KEY = 'onk1aMdIZZ4P86E99JlD095UEVH7LfIUwwmEF7KQ'
-
-# Paste your API key here. Remember to not share it publicly
-os.environ['COHERE_KEY'] = COHERE_KEY
 logger = logging.getLogger('uvicorn')
+
+API_KEY = settings.COHERE_KEY
 
 
 class TalePrompt:
@@ -48,7 +47,7 @@ class TalePrompt:
     async def create(cls, line, as_tale: str = None, **kwargs):
         """Initializes async client."""
         self = cls(line, as_tale, **kwargs)
-        self.client = await cohere.AsyncClient.create(COHERE_KEY)
+        self.client = await cohere.AsyncClient.create(API_KEY)
         return self
 
     async def generate(
